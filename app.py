@@ -1062,17 +1062,28 @@ with tab4:
                 st.markdown(f"""
                 <table style="width: 100%; border-collapse: collapse;">
                     <tr>
-                        <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 10%;">
+                        <td rowspan="2" style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 10%;">
                             제조 공정
                         </td>
-                        <td style="border: 1px solid #1f2937; background-color: white; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 10%;">
+                        <td rowspan="2" style="border: 1px solid #1f2937; background-color: white; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 10%;">
                             &nbsp;
                         </td>
-                        <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 15px;">
+                        <td colspan="4" style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 20px; font-weight: bold; padding: 15px;">
                             유해위험요인 분류
                         </td>
                         <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 10%;">
                             세부 공정
+                        </td>
+                        <td style="border: 1px solid #1f2937; background-color: white; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 10%;">
+                            &nbsp;
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 14px; font-weight: bold; padding: 10px; width: 15%;">
+                            분류
+                        </td>
+                        <td colspan="3" style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 14px; font-weight: bold; padding: 10px;">
+                            &nbsp;
                         </td>
                         <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 10%;">
                             분류 코드
@@ -1091,7 +1102,7 @@ with tab4:
                         row_items = items[row_idx:row_idx+3]
                         
                         # 행의 각 항목을 표시
-                        cols = st.columns([0.5, 0.5, 1.2, 0.8, 0.8, 0.8, 2.4, 0.8, 0.8, 0.5])
+                        cols = st.columns([0.5, 0.5, 1.2, 0.8, 0.8, 0.8, 2.4, 0.8, 0.8])
                         
                         # 분류 번호 (각 카테고리의 첫 번째 행에만 표시)
                         with cols[0]:
@@ -1144,27 +1155,26 @@ with tab4:
                                         st.session_state.hazard_classifications[process_key][key] = {}
                                     st.session_state.hazard_classifications[process_key][key]['hazard'] = hazard_input
                         
-                        # 세부 공정 (첫 번째 카테고리의 첫 번째 행에만 표시)
+                        # 세부 공정과 분류 코드 (첫 번째 카테고리의 첫 번째 행에만 표시)
                         with cols[7]:
                             if category_idx == 0 and row_idx == 0:
-                                st.text_area(f"세부공정_{process_key}", 
-                                           value=process['name'], 
-                                           disabled=True, 
-                                           label_visibility="collapsed",
-                                           height=50)
+                                # 위쪽: 세부공정 텍스트
+                                st.markdown(f'<div style="text-align: center; font-size: 12px; margin-bottom: 5px;">세부 공정</div>', unsafe_allow_html=True)
+                                # 아래쪽: 분류코드 텍스트
+                                st.markdown(f'<div style="text-align: center; font-size: 12px; margin-top: 15px;">분류 코드</div>', unsafe_allow_html=True)
                         
-                        # 분류 코드 (첫 번째 카테고리의 첫 번째 행에만 표시)
+                        # 세부공정 값과 분류코드 입력란
                         with cols[8]:
                             if category_idx == 0 and row_idx == 0:
-                                st.text_input(f"분류코드_{process_key}", 
+                                # 세부공정 (자동입력) - 2번째 탭의 공정명
+                                st.text_input(f"세부공정값_{process_key}", 
+                                           value=process['name'], 
+                                           disabled=True, 
+                                           label_visibility="collapsed")
+                                # 분류코드 (입력 가능)
+                                st.text_input(f"분류코드값_{process_key}", 
                                            placeholder="분류코드 입력",
                                            label_visibility="collapsed")
-                        
-                        # 입력공간 (두 번째) - 빈 입력칸
-                        with cols[9]:
-                            st.text_area(f"입력공간2_{process_key}_{category_idx}_{row_idx}", 
-                                       label_visibility="collapsed",
-                                       height=50)
                         
                         st.markdown('<hr style="margin: 5px 0; border: 0; border-top: 1px solid #e5e7eb;">', unsafe_allow_html=True)
                 
