@@ -1063,40 +1063,37 @@ with tab4:
                 st.markdown(f"""
                 <table style="width: 100%; border-collapse: collapse;">
                     <tr>
-                        <td style="border: 1px solid #000; background-color: #fef3c7; text-align: center; font-weight: bold; padding: 10px; width: 10%;">
+                        <td rowspan="2" style="border: 1px solid #000; background-color: #fef3c7; text-align: center; font-weight: bold; padding: 10px; width: 10%;">
                             제조 공정
                         </td>
-                        <td style="border: 1px solid #000; background-color: white; padding: 10px; width: 10%;">
+                        <td rowspan="2" style="border: 1px solid #000; background-color: white; padding: 10px; width: 10%;">
                         </td>
-                        <td style="border: 1px solid #000; background-color: #fef3c7; text-align: center; font-weight: bold; font-size: 18px; padding: 10px;">
+                        <td colspan="3" style="border: 1px solid #000; background-color: #fef3c7; text-align: center; font-weight: bold; font-size: 18px; padding: 10px;">
                             유해위험요인 분류
                         </td>
-                        <td style="border: 1px solid #000; background-color: #fef3c7; text-align: center; font-weight: bold; padding: 10px; width: 10%;">
+                        <td rowspan="2" style="border: 1px solid #000; background-color: #fef3c7; text-align: center; font-weight: bold; padding: 10px; width: 10%;">
                             세부 공정
                         </td>
-                        <td style="border: 1px solid #000; background-color: white; padding: 10px; width: 10%;">
+                        <td rowspan="2" style="border: 1px solid #000; background-color: #fef3c7; text-align: center; font-weight: bold; padding: 10px; width: 10%;">
+                            분류 코드
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="3" style="border: 1px solid #000; background-color: white; padding: 10px;">
-                        </td>
-                        <td style="border: 1px solid #000; background-color: #fef3c7; text-align: center; font-weight: bold; padding: 10px;">
-                            분류 코드
-                        </td>
-                        <td style="border: 1px solid #000; background-color: white; padding: 10px;">
+                        <td colspan="3" style="border: 1px solid #000; background-color: white; text-align: center; font-weight: bold; padding: 10px; color: red;">
+                            빨간색 박스 전체 : 제거
                         </td>
                     </tr>
                 </table>
                 """, unsafe_allow_html=True)
                 
                 # 상단 입력 필드
-                cols_top = st.columns([1, 1, 1, 1, 1])
+                cols_top = st.columns([1, 3, 1, 1])
                 with cols_top[1]:
-                    st.text_input("", label_visibility="collapsed", key=f"mfg_input_{process_key}")
+                    st.text_input("제조공정", label_visibility="collapsed", key=f"mfg_input_{process_key}")
+                with cols_top[2]:
+                    st.text_input("세부공정", value=process['name'], disabled=True, label_visibility="collapsed", key=f"subprocess_auto_{process_key}")
                 with cols_top[3]:
-                    st.text_input("", value=process['name'], disabled=True, label_visibility="collapsed", key=f"subprocess_auto_{process_key}")
-                with cols_top[4]:
-                    st.text_input("", label_visibility="collapsed", key=f"classcode_input_{process_key}")
+                    st.text_input("분류코드", label_visibility="collapsed", key=f"classcode_input_{process_key}")
                 
                 # 유해위험요인 분류 테이블
                 st.markdown("""
