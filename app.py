@@ -213,13 +213,48 @@ with tab1:
     col1, col2, col3 = st.columns([1, 1, 1])
     
     with col2:
-        if st.button("💾 표지 데이터 저장", use_container_width=True):
-            # JSON으로 저장
-            json_str = json.dumps(st.session_state.form_data, ensure_ascii=False, indent=2)
-            b64 = base64.b64encode(json_str.encode()).decode()
-            href = f'<a href="data:application/json;base64,{b64}" download="위험성평가_표지_{st.session_state.form_data.get("year", "YYYY")}.json">다운로드 링크를 클릭하세요</a>'
+        if st.button("💾 표지 엑셀 저장", use_container_width=True):
+            # 엑셀로 저장
+            df = pd.DataFrame([st.session_state.form_data])
+            
+            # 결재자 정보를 별도 열로 분리
+            for i, approver in enumerate(st.session_state.form_data['approvers']):
+                df[f'결재자{i+1}_직위'] = approver['position']
+                df[f'결재자{i+1}_성명'] = approver['name']
+            
+            # approvers 컬럼 제거
+            df = df.drop('approvers', axis=1)
+            
+            output = BytesIO()
+            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                df.to_excel(writer, sheet_name='표지', index=False)
+                
+                # 서식 설정
+                workbook = writer.book
+                worksheet = writer.sheets['표지']
+                
+                # 헤더 서식
+                header_format = workbook.add_format({
+                    'bg_color': '#fef3c7',
+                    'border': 1,
+                    'align': 'center',
+                    'valign': 'vcenter',
+                    'font_size': 12,
+                    'bold': True
+                })
+                
+                # 헤더 서식 적용
+                for col_num, value in enumerate(df.columns.values):
+                    worksheet.write(0, col_num, value, header_format)
+                
+                # 열 너비 조정
+                worksheet.set_column('A:Z', 20)
+            
+            output.seek(0)
+            b64 = base64.b64encode(output.read()).decode()
+            href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="위험성평가_표지_{st.session_state.form_data.get("year", "YYYY")}.xlsx">📥 엑셀 파일 다운로드</a>'
             st.markdown(href, unsafe_allow_html=True)
-            st.success("표지 데이터가 저장되었습니다!")
+            st.success("표지가 엑셀 파일로 저장되었습니다!")
 
 with tab2:
     st.markdown('<h2 style="text-align: center; color: #1f2937;">1. 사업장 개요</h2>', unsafe_allow_html=True)
@@ -421,19 +456,62 @@ with tab2:
     st.markdown('<br>', unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
-        if st.button("💾 사업장 개요 데이터 저장", use_container_width=True, key="save_tab2"):
-            # 사업장 개요 데이터 수집
-            overview_data = {
-                'business_info': st.session_state.business_info,
-                'processes': st.session_state.processes
-            }
+        if st.button("💾 사업장 개요 엑셀 저장", use_container_width=True, key="save_tab2"):
+            # 사업장 개요 데이터
+            overview_df = pd.DataFrame([st.session_state.business_info])
             
-            # JSON으로 저장
-            json_str = json.dumps(overview_data, ensure_ascii=False, indent=2)
-            b64 = base64.b64encode(json_str.encode()).decode()
-            href = f'<a href="data:application/json;base64,{b64}" download="위험성평가_사업장개요_{datetime.now().strftime("%Y%m%d")}.json">다운로드 링크를 클릭하세요</a>'
+            # 공정 데이터
+            process_list = []
+            for process in st.session_state.processes:
+                if process['name']:
+                    process_list.append({
+                        '공정명': process['name'],
+                        '공정설명': process['description'],
+                        '주요기계기구': process['equipment'],
+                        '유해위험물질': process['hazardous_material'],
+                        '유해위험요인': process['hazardous_factor']
+                    })
+            
+            process_df = pd.DataFrame(process_list)
+            
+            # 엑셀로 저장
+            output = BytesIO()
+            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                overview_df.to_excel(writer, sheet_name='사업장정보', index=False)
+                if not process_df.empty:
+                    process_df.to_excel(writer, sheet_name='공정정보', index=False)
+                
+                # 서식 설정
+                workbook = writer.book
+                header_format = workbook.add_format({
+                    'bg_color': '#fef3c7',
+                    'border': 1,
+                    'align': 'center',
+                    'valign': 'vcenter',
+                    'font_size': 12,
+                    'bold': True
+                })
+                
+                # 각 시트에 서식 적용
+                for sheet_name in writer.sheets:
+                    worksheet = writer.sheets[sheet_name]
+                    df = overview_df if sheet_name == '사업장정보' else process_df
+                    
+                    for col_num, value in enumerate(df.columns.values):
+                        worksheet.write(0, col_num, value, header_format)
+                    
+                    # 열 너비 조정
+                    if sheet_name == '사업장정보':
+                        worksheet.set_column('A:F', 20)
+                    else:
+                        worksheet.set_column('A:A', 15)
+                        worksheet.set_column('B:E', 30)
+            
+            output.seek(0)
+            b64 = base64.b64encode(output.read()).decode()
+            href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="위험성평가_사업장개요_{datetime.now().strftime("%Y%m%d")}.xlsx">📥 엑셀 파일 다운로드</a>'
             st.markdown(href, unsafe_allow_html=True)
-            st.success("사업장 개요 데이터가 저장되었습니다!")
+            st.success("사업장 개요가 엑셀 파일로 저장되었습니다!")
 
 with tab3:
     st.markdown('<h2 style="text-align: center; color: #1f2937;">안전보건상 위험정보</h2>', unsafe_allow_html=True)
@@ -506,125 +584,169 @@ with tab3:
     st.markdown("""
     <table class="process-table">
         <tr>
-            <th rowspan="2" class="process-header" style="width: 10%;">공정<br>(작업)순서</th>
+            <th rowspan="2" class="process-header" style="width: 8%;">공정<br>(작업)순서</th>
             <th colspan="2" class="process-header">기계기구 및 설비명</th>
-            <th colspan="2" class="process-header">유해화학물질</th>
+            <th colspan="3" class="process-header">유해화학물질</th>
             <th colspan="8" class="process-header">기타 안전보건상 정보</th>
         </tr>
         <tr>
-            <th class="sub-header" style="width: 15%;">기계기구 및<br>설비명</th>
-            <th class="sub-header" style="width: 5%;">수량</th>
-            <th class="sub-header" style="width: 15%;">화학물질명</th>
-            <th class="sub-header" style="width: 7%;">취급량/일</th>
-            <th class="sub-header" style="width: 7%;">취급시간</th>
-            <th class="sub-header" style="width: 7%;">3년간<br>재해사례</th>
-            <th class="sub-header" style="width: 7%;">앗차<br>사고사례</th>
-            <th class="sub-header" style="width: 7%;">근로자<br>구성및특성</th>
-            <th class="sub-header" style="width: 7%;">도급/교대<br>작업유무</th>
-            <th class="sub-header" style="width: 7%;">운반수단</th>
-            <th class="sub-header" style="width: 8%;">안전작업<br>허가증<br>필요작업</th>
-            <th class="sub-header" style="width: 8%;">작업환경<br>측정유무</th>
-            <th class="sub-header" style="width: 10%;">특별안전<br>교육대상</th>
+            <th class="sub-header">기계기구 및<br>설비명</th>
+            <th class="sub-header">수량</th>
+            <th class="sub-header">화학물질명</th>
+            <th class="sub-header">취급량/일</th>
+            <th class="sub-header">취급시간</th>
+            <th class="sub-header">3년간<br>재해사례</th>
+            <th class="sub-header">앗차<br>사고사례</th>
+            <th class="sub-header">근로자<br>구성및특성</th>
+            <th class="sub-header">도급/교대<br>작업유무</th>
+            <th class="sub-header">운반수단</th>
+            <th class="sub-header">안전작업<br>허가증<br>필요작업</th>
+            <th class="sub-header">작업환경<br>측정유무</th>
+            <th class="sub-header">특별안전<br>교육대상</th>
         </tr>
     </table>
     """, unsafe_allow_html=True)
+    
+    # 데이터 저장을 위한 리스트
+    process_data_list = []
     
     # 공정별 데이터 입력
     if 'processes' in st.session_state:
         for idx, process in enumerate(st.session_state.processes):
             if process['name']:
-                # 모든 컬럼을 한 줄에 배치
-                cols = st.columns([1, 1.5, 0.5, 1.5, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.8, 0.8, 1])
+                # 균등한 컬럼 분할
+                cols = st.columns([0.8, 1.2, 0.5, 1.2, 0.6, 0.6, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8])
+                
+                # 각 필드의 값을 저장할 딕셔너리
+                process_row = {}
                 
                 # 공정(작업)순서
                 with cols[0]:
+                    process_row['공정순서'] = process['name']
                     st.text_input(f"공정_{idx}", value=process['name'], disabled=True, label_visibility="collapsed")
                 
                 # 기계기구 및 설비명
                 with cols[1]:
+                    process_row['기계기구및설비명'] = process['equipment']
                     st.text_area(f"기계_{idx}", value=process['equipment'], height=100, disabled=True, label_visibility="collapsed")
                 
                 # 수량
                 with cols[2]:
-                    st.text_input(f"수량_{idx}", placeholder="", label_visibility="collapsed")
+                    qty = st.text_input(f"수량_{idx}", placeholder="", label_visibility="collapsed", key=f"qty_{idx}")
+                    process_row['수량'] = qty
                 
                 # 화학물질명
                 with cols[3]:
+                    process_row['화학물질명'] = process['hazardous_material']
                     st.text_area(f"화학_{idx}", value=process['hazardous_material'], height=100, disabled=True, label_visibility="collapsed")
                 
                 # 취급량/일
                 with cols[4]:
-                    st.text_input(f"취급량_{idx}", placeholder="", label_visibility="collapsed")
+                    amount = st.text_input(f"취급량_{idx}", placeholder="", label_visibility="collapsed", key=f"amount_{idx}")
+                    process_row['취급량/일'] = amount
                 
                 # 취급시간
                 with cols[5]:
-                    st.text_input(f"취급시간_{idx}", placeholder="", label_visibility="collapsed")
+                    time = st.text_input(f"취급시간_{idx}", placeholder="", label_visibility="collapsed", key=f"time_{idx}")
+                    process_row['취급시간'] = time
                 
                 # 3년간 재해사례
                 with cols[6]:
-                    st.text_input(f"재해사례_{idx}", placeholder="", label_visibility="collapsed")
+                    accident = st.text_input(f"재해사례_{idx}", placeholder="", label_visibility="collapsed", key=f"accident_{idx}")
+                    process_row['3년간재해사례'] = accident
                 
                 # 앗차사고사례
                 with cols[7]:
-                    st.text_input(f"앗차_{idx}", placeholder="", label_visibility="collapsed")
+                    near_miss = st.text_input(f"앗차_{idx}", placeholder="", label_visibility="collapsed", key=f"near_miss_{idx}")
+                    process_row['앗차사고사례'] = near_miss
                 
                 # 근로자 구성및특성
                 with cols[8]:
-                    st.text_input(f"근로자구성_{idx}", placeholder="", label_visibility="collapsed")
+                    workers = st.text_input(f"근로자구성_{idx}", placeholder="", label_visibility="collapsed", key=f"workers_{idx}")
+                    process_row['근로자구성및특성'] = workers
                 
                 # 도급/교대 작업유무
                 with cols[9]:
-                    st.selectbox(f"도급_{idx}", ["", "유", "무"], label_visibility="collapsed")
+                    contract = st.selectbox(f"도급_{idx}", ["", "유", "무"], label_visibility="collapsed", key=f"contract_{idx}")
+                    process_row['도급/교대작업유무'] = contract
                 
                 # 운반수단
                 with cols[10]:
-                    st.text_input(f"운반_{idx}", placeholder="", label_visibility="collapsed")
+                    transport = st.text_input(f"운반_{idx}", placeholder="", label_visibility="collapsed", key=f"transport_{idx}")
+                    process_row['운반수단'] = transport
                 
                 # 안전작업허가증필요작업
                 with cols[11]:
-                    st.selectbox(f"허가증_{idx}", ["", "유", "무"], label_visibility="collapsed")
+                    permit = st.selectbox(f"허가증_{idx}", ["", "유", "무"], label_visibility="collapsed", key=f"permit_{idx}")
+                    process_row['안전작업허가증필요작업'] = permit
                 
                 # 작업환경측정유무
                 with cols[12]:
-                    st.selectbox(f"측정_{idx}", ["", "유", "무"], label_visibility="collapsed")
+                    measurement = st.selectbox(f"측정_{idx}", ["", "유", "무"], label_visibility="collapsed", key=f"measurement_{idx}")
+                    process_row['작업환경측정유무'] = measurement
                 
                 # 특별안전교육대상
                 with cols[13]:
-                    st.text_input(f"특별교육_{idx}", placeholder="", label_visibility="collapsed")
+                    special_edu = st.text_input(f"특별교육_{idx}", placeholder="", label_visibility="collapsed", key=f"special_edu_{idx}")
+                    process_row['특별안전교육대상'] = special_edu
                 
+                process_data_list.append(process_row)
                 st.markdown('<hr style="margin: 10px 0; border: 0; border-top: 1px solid #d97706;">', unsafe_allow_html=True)
     
-    # 데이터 저장 버튼
+    # 데이터 저장 버튼 (엑셀)
     st.markdown('<br>', unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
-        if st.button("💾 위험정보 데이터 저장", use_container_width=True, key="save_tab3"):
-            # 위험정보 데이터 수집
-            risk_data = {
-                'industry_name': st.session_state.get('industry_name', ''),
-                'product_name': st.session_state.get('product_name', ''),
-                'raw_material': st.session_state.get('raw_material', ''),
-                'workers_info': st.session_state.get('workers_info', ''),
-                'processes': []
+        if st.button("💾 위험정보 엑셀 저장", use_container_width=True, key="save_tab3"):
+            # 상단 정보
+            header_data = {
+                '업종명': st.session_state.get('industry_name', ''),
+                '생산품': st.session_state.get('product_name', ''),
+                '원재료': st.session_state.get('raw_material', ''),
+                '근로자': st.session_state.get('workers_info', '')
             }
             
-            # 프로세스별 데이터 수집
-            for idx, process in enumerate(st.session_state.processes):
-                if process['name']:
-                    process_data = {
-                        'name': process['name'],
-                        'equipment': process['equipment'],
-                        'hazardous_material': process['hazardous_material'],
-                        # 추가 입력 필드들도 수집 가능
-                    }
-                    risk_data['processes'].append(process_data)
+            # 엑셀 파일 생성
+            output = BytesIO()
+            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                # 헤더 정보
+                df_header = pd.DataFrame([header_data])
+                df_header.to_excel(writer, sheet_name='기본정보', index=False)
+                
+                # 공정 정보
+                if process_data_list:
+                    df_process = pd.DataFrame(process_data_list)
+                    df_process.to_excel(writer, sheet_name='공정정보', index=False)
+                
+                # 서식 설정
+                workbook = writer.book
+                header_format = workbook.add_format({
+                    'bg_color': '#fef3c7',
+                    'border': 1,
+                    'align': 'center',
+                    'valign': 'vcenter',
+                    'font_size': 12,
+                    'bold': True
+                })
+                
+                # 헤더 서식 적용
+                for worksheet in writer.sheets.values():
+                    for col_num, value in enumerate(df_process.columns.values if 'df_process' in locals() else []):
+                        worksheet.write(0, col_num, value, header_format)
+                    
+                    # 열 너비 자동 조정
+                    worksheet.set_column(0, 0, 15)  # 공정순서
+                    worksheet.set_column(1, 1, 30)  # 기계기구
+                    worksheet.set_column(2, 2, 10)  # 수량
+                    worksheet.set_column(3, 3, 30)  # 화학물질
+                    worksheet.set_column(4, 13, 15)  # 나머지 열들
             
-            # JSON으로 저장
-            json_str = json.dumps(risk_data, ensure_ascii=False, indent=2)
-            b64 = base64.b64encode(json_str.encode()).decode()
-            href = f'<a href="data:application/json;base64,{b64}" download="위험성평가_위험정보_{datetime.now().strftime("%Y%m%d")}.json">다운로드 링크를 클릭하세요</a>'
+            # 다운로드 링크 생성
+            output.seek(0)
+            b64 = base64.b64encode(output.read()).decode()
+            href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="위험성평가_위험정보_{datetime.now().strftime("%Y%m%d")}.xlsx">📥 엑셀 파일 다운로드</a>'
             st.markdown(href, unsafe_allow_html=True)
-            st.success("위험정보 데이터가 저장되었습니다!")
+            st.success("위험정보가 엑셀 파일로 저장되었습니다!")
 
 # 사이드바에 도움말 추가
 with st.sidebar:
