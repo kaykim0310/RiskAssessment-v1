@@ -115,7 +115,7 @@ st.markdown('<h1 style="text-align: center; color: #1f2937;">위험성평가 작
 st.markdown('---')
 
 # 탭 생성
-tab1, tab2, tab3 = st.tabs(["📄 표지", "📊 사업장 개요", "⚠️ 위험정보"])
+tab1, tab2, tab3, tab4 = st.tabs(["📄 표지", "📊 사업장 개요", "⚠️ 위험정보", "📋 유해위험요인"])
 
 with tab1:
     st.markdown('<div class="cover-container">', unsafe_allow_html=True)
@@ -789,6 +789,245 @@ with tab3:
             st.markdown(href, unsafe_allow_html=True)
             st.success("위험정보가 엑셀 파일로 저장되었습니다!")
 
+with tab4:
+    st.markdown('<h2 style="text-align: center; color: #1f2937;">유해위험요인 분류</h2>', unsafe_allow_html=True)
+    
+    # 유해위험요인 분류 기준 데이터
+    hazard_categories = {
+        '기계(설비)적 요인': [
+            '1.1 끼임(협착/감김/말림)',
+            '1.2 부딪힘 위험 분류',
+            '1.3 맞음(낙하/비래 물체)',
+            '1.4 베임 등 (찔림/절단 등)',
+            '1.5 넘어짐',
+            '1.6 물체 취급(무리/부자연스러운 등)'
+        ],
+        '전기적 요인': [
+            '2.1 감전(누전현상 포함)',
+            '2.2 아크/화재 폭발',
+            '2.3 정전기'
+        ],
+        '화학(물질)적 요인': [
+            '3.1 가스',
+            '3.2 열탕•미스트',
+            '3.3 분진산',
+            '3.4 연기•미스트',
+            '3.5 크레(분진)',
+            '3.6 흄(용접 흄)',
+            '3.7 망사산',
+            '3.8 화재•폭발위험',
+            '3.9 목사산•목발림업'
+        ],
+        '생물학적 요인': [
+            '4.1 병원균 미생물 라이브러스와 의한 술병',
+            '4.2 동물',
+            '4.3 식물',
+            '4.4 곤충(유충과)',
+            '4.5 식물'
+        ],
+        '작업특성 요인': [
+            '5.1 소음',
+            '5.2 근골격 질도(중량물 등)',
+            '5.3 적외선(고압)(공보)',
+            '5.4 진동',
+            '5.5 허천 또는 코렁상태',
+            '5.6 복식장해•산소결핍',
+            '5.7 충병물독(고장)',
+            '5.8 방벽작업',
+            '5.9 무산소화 가(중저,)',
+            '5.10 작업(교차) 포크',
+            '5.11 기후 / 교온 / 한랭'
+        ],
+        '작업환경 요인': [
+            '6.1 기후•교온•한랭',
+            '6.2 조명',
+            '6.3 공간 및 이동통로',
+            '6.4 구멍 큰보자',
+            '6.5 작업시간',
+            '6.6 조조 앞곳면회',
+            '6.7 이상'
+        ]
+    }
+    
+    # 세션 상태 초기화
+    if 'hazard_classifications' not in st.session_state:
+        st.session_state.hazard_classifications = {}
+    
+    # 공정별로 유해위험요인 분류표 생성
+    if 'processes' in st.session_state:
+        for idx, process in enumerate(st.session_state.processes):
+            if process['name']:  # 공정명이 있는 경우만
+                st.markdown(f'<h3 style="text-align: center; color: #1f2937; margin-top: 30px;">공정: {process["name"]}</h3>', unsafe_allow_html=True)
+                
+                # 각 공정별 데이터 저장을 위한 키
+                process_key = f"hazard_{idx}"
+                if process_key not in st.session_state.hazard_classifications:
+                    st.session_state.hazard_classifications[process_key] = {}
+                
+                # 테이블 스타일
+                st.markdown("""
+                <style>
+                .hazard-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px;
+                    margin-bottom: 30px;
+                }
+                .hazard-table th, .hazard-table td {
+                    border: 1px solid #1f2937;
+                    padding: 8px;
+                    text-align: left;
+                    vertical-align: top;
+                }
+                .hazard-table th {
+                    background-color: #fef3c7;
+                    font-weight: bold;
+                    text-align: center;
+                }
+                .hazard-category {
+                    background-color: #fef3c7;
+                    font-weight: bold;
+                    text-align: center;
+                    width: 15%;
+                }
+                .hazard-detail {
+                    width: 35%;
+                }
+                .hazard-process {
+                    text-align: center;
+                    font-weight: bold;
+                    width: 15%;
+                }
+                </style>
+                """, unsafe_allow_html=True)
+                
+                # 테이블 헤더
+                st.markdown(f"""
+                <table class="hazard-table">
+                    <tr>
+                        <th rowspan="2">제조 공정</th>
+                        <th colspan="3">유해위험요인 분류</th>
+                        <th rowspan="2">세부 공정<br><br>분류 코드</th>
+                    </tr>
+                    <tr>
+                        <th>분류</th>
+                        <th>분야</th>
+                        <th>유해 위험 요인</th>
+                    </tr>
+                </table>
+                """, unsafe_allow_html=True)
+                
+                # 각 카테고리별로 행 생성
+                category_rows = []
+                for category_idx, (category, items) in enumerate(hazard_categories.items()):
+                    for item_idx, item in enumerate(items):
+                        row_key = f"{process_key}_{category_idx}_{item_idx}"
+                        cols = st.columns([1, 1.5, 2.5, 3, 1.5])
+                        
+                        with cols[0]:
+                            if item_idx == 0:  # 각 카테고리의 첫 번째 항목에서만 표시
+                                st.text_input("제조공정", value=f"{idx+1}", disabled=True, label_visibility="collapsed", key=f"mfg_{row_key}")
+                        
+                        with cols[1]:
+                            if item_idx == 0:  # 각 카테고리의 첫 번째 항목에서만 표시
+                                st.text_input("분류", value=category, disabled=True, label_visibility="collapsed", key=f"cat_{row_key}")
+                        
+                        with cols[2]:
+                            st.text_input("분야", value=item, disabled=True, label_visibility="collapsed", key=f"field_{row_key}")
+                        
+                        with cols[3]:
+                            hazard = st.text_area("유해위험요인", placeholder="유해위험요인 입력", label_visibility="collapsed", 
+                                                 key=f"hazard_{row_key}", height=50)
+                            if hazard:
+                                if row_key not in st.session_state.hazard_classifications[process_key]:
+                                    st.session_state.hazard_classifications[process_key][row_key] = {}
+                                st.session_state.hazard_classifications[process_key][row_key]['hazard'] = hazard
+                        
+                        with cols[4]:
+                            if item_idx == 0:  # 각 카테고리의 첫 번째 항목에서만 표시
+                                st.text_input("세부공정", value=process['name'], disabled=True, label_visibility="collapsed", key=f"proc_{row_key}")
+                        
+                        st.markdown('<hr style="margin: 5px 0; border: 0; border-top: 1px solid #e5e7eb;">', unsafe_allow_html=True)
+                
+                st.markdown('<hr style="margin: 30px 0; border: 0; border-top: 2px solid #1f2937;">', unsafe_allow_html=True)
+    
+    # 데이터 저장 버튼
+    st.markdown('<br>', unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col2:
+        if st.button("💾 유해위험요인 엑셀 저장", use_container_width=True, key="save_tab4"):
+            # 엑셀 데이터 준비
+            all_hazard_data = []
+            
+            for process_idx, process in enumerate(st.session_state.processes):
+                if process['name']:
+                    process_key = f"hazard_{process_idx}"
+                    if process_key in st.session_state.hazard_classifications:
+                        for category_idx, (category, items) in enumerate(hazard_categories.items()):
+                            for item_idx, item in enumerate(items):
+                                row_key = f"{process_key}_{category_idx}_{item_idx}"
+                                if row_key in st.session_state.hazard_classifications[process_key]:
+                                    hazard_data = st.session_state.hazard_classifications[process_key][row_key]
+                                    if 'hazard' in hazard_data and hazard_data['hazard']:
+                                        all_hazard_data.append({
+                                            '제조공정': process_idx + 1,
+                                            '분류': category,
+                                            '분야': item,
+                                            '유해위험요인': hazard_data['hazard'],
+                                            '세부공정': process['name']
+                                        })
+            
+            if all_hazard_data:
+                # 엑셀 파일 생성
+                df = pd.DataFrame(all_hazard_data)
+                output = BytesIO()
+                
+                with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                    df.to_excel(writer, sheet_name='유해위험요인분류', index=False)
+                    
+                    # 서식 설정
+                    from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
+                    
+                    header_fill = PatternFill(start_color='FEF3C7', end_color='FEF3C7', fill_type='solid')
+                    header_font = Font(bold=True, size=12)
+                    header_alignment = Alignment(horizontal='center', vertical='center')
+                    thin_border = Border(
+                        left=Side(style='thin'),
+                        right=Side(style='thin'),
+                        top=Side(style='thin'),
+                        bottom=Side(style='thin')
+                    )
+                    
+                    worksheet = writer.sheets['유해위험요인분류']
+                    
+                    # 헤더 서식
+                    for cell in worksheet[1]:
+                        cell.fill = header_fill
+                        cell.font = header_font
+                        cell.alignment = header_alignment
+                        cell.border = thin_border
+                    
+                    # 열 너비 자동 조정
+                    for column in worksheet.columns:
+                        max_length = 0
+                        column = [cell for cell in column]
+                        for cell in column:
+                            try:
+                                if len(str(cell.value)) > max_length:
+                                    max_length = len(str(cell.value))
+                            except:
+                                pass
+                        adjusted_width = (max_length + 2) * 1.2
+                        worksheet.column_dimensions[column[0].column_letter].width = adjusted_width
+                
+                output.seek(0)
+                b64 = base64.b64encode(output.read()).decode()
+                href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="위험성평가_유해위험요인_{datetime.now().strftime("%Y%m%d")}.xlsx">📥 엑셀 파일 다운로드</a>'
+                st.markdown(href, unsafe_allow_html=True)
+                st.success("유해위험요인 분류표가 엑셀 파일로 저장되었습니다!")
+            else:
+                st.warning("저장할 데이터가 없습니다. 유해위험요인을 입력해주세요.")
+
 # 사이드바에 도움말 추가
 with st.sidebar:
     st.markdown("### 📌 사용 방법")
@@ -796,7 +1035,8 @@ with st.sidebar:
     1. **표지 탭**에서 기본 정보를 입력하세요
     2. **사업장 개요 탭**에서 공정 정보를 입력하세요
     3. **위험정보 탭**에서 위험성평가를 수행하세요
-    4. 완료 후 전체 보고서를 생성할 수 있습니다
+    4. **유해위험요인 탭**에서 위험요인을 분류하세요
+    5. 완료 후 전체 보고서를 생성할 수 있습니다
     """)
     
     st.markdown("### 🔧 기능")
