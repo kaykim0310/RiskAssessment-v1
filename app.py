@@ -438,18 +438,22 @@ with tab3:
     }
     .process-table th, .process-table td {
         border: 1px solid #d97706;
-        padding: 8px;
+        padding: 10px;
         text-align: center;
     }
     .process-header {
         background-color: #fef3c7;
         font-weight: bold;
-        font-size: 13px;
+        font-size: 14px;
     }
     .sub-header {
         background-color: #fef3c7;
-        font-size: 11px;
+        font-size: 12px;
         font-weight: normal;
+    }
+    .stTextInput input, .stTextArea textarea, .stSelectbox select {
+        font-size: 14px !important;
+        padding: 8px !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -484,24 +488,24 @@ with tab3:
     st.markdown("""
     <table class="process-table">
         <tr>
-            <th rowspan="3" class="process-header">공정<br>(작업)순서</th>
+            <th rowspan="3" class="process-header" style="width: 10%;">공정<br>(작업)순서</th>
             <th colspan="3" class="process-header">기계기구 및 설비명</th>
             <th colspan="3" class="process-header">유해화학물질</th>
-            <th colspan="8" class="process-header">기타 안전보건상 정보</th>
+            <th colspan="7" class="process-header">기타 안전보건상 정보</th>
         </tr>
         <tr>
-            <th rowspan="2" class="sub-header">기계기구 및<br>설비명</th>
-            <th rowspan="2" class="sub-header">수량</th>
-            <th rowspan="2" class="sub-header">화학물질명</th>
-            <th rowspan="2" class="sub-header">취급량/일</th>
-            <th rowspan="2" class="sub-header">취급시간</th>
-            <th rowspan="2" class="sub-header">3년간<br>재해사례</th>
-            <th rowspan="2" class="sub-header">앗차<br>사고사례</th>
-            <th rowspan="2" class="sub-header">근로자<br>구성및특성</th>
-            <th rowspan="2" class="sub-header">도급/교대<br>작업유무</th>
-            <th rowspan="2" class="sub-header">운반수단</th>
-            <th class="sub-header">안전작업<br>허가증유무</th>
-            <th class="sub-header">작업환경<br>측정유무</th>
+            <th rowspan="2" class="sub-header" style="width: 15%;">기계기구 및<br>설비명</th>
+            <th rowspan="2" class="sub-header" style="width: 5%;">수량</th>
+            <th rowspan="2" class="sub-header" style="width: 15%;">화학물질명</th>
+            <th rowspan="2" class="sub-header" style="width: 7%;">취급량/일</th>
+            <th rowspan="2" class="sub-header" style="width: 7%;">취급시간</th>
+            <th rowspan="2" class="sub-header" style="width: 7%;">3년간<br>재해사례</th>
+            <th rowspan="2" class="sub-header" style="width: 7%;">앗차<br>사고사례</th>
+            <th rowspan="2" class="sub-header" style="width: 7%;">근로자<br>구성및특성</th>
+            <th rowspan="2" class="sub-header" style="width: 7%;">도급/교대<br>작업유무</th>
+            <th rowspan="2" class="sub-header" style="width: 7%;">운반수단</th>
+            <th class="sub-header" style="width: 8%;">안전작업<br>허가증<br>필요작업</th>
+            <th class="sub-header" style="width: 8%;">작업환경<br>측정유무</th>
         </tr>
         <tr>
             <th colspan="2" class="sub-header">특별안전<br>교육대상</th>
@@ -514,7 +518,7 @@ with tab3:
         for idx, process in enumerate(st.session_state.processes):
             if process['name']:
                 # 메인 데이터 행
-                cols = st.columns([1, 1.5, 0.5, 1.5, 0.5, 0.5, 0.5, 0.5, 0.8, 0.6, 0.6, 0.6, 0.6])
+                cols = st.columns([1, 1.5, 0.5, 1.5, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.8, 0.8])
                 
                 # 공정(작업)순서
                 with cols[0]:
@@ -522,19 +526,19 @@ with tab3:
                 
                 # 기계기구 및 설비명
                 with cols[1]:
-                    st.text_area(f"기계_{idx}", value=process['equipment'], height=80, disabled=True, label_visibility="collapsed")
+                    st.text_area(f"기계_{idx}", value=process['equipment'], height=100, disabled=True, label_visibility="collapsed")
                 
-                # 기계 수량
+                # 수량
                 with cols[2]:
-                    st.text_input(f"기계수량_{idx}", placeholder="", label_visibility="collapsed")
+                    st.text_input(f"수량_{idx}", placeholder="", label_visibility="collapsed")
                 
                 # 화학물질명
                 with cols[3]:
-                    st.text_area(f"화학_{idx}", value=process['hazardous_material'], height=80, disabled=True, label_visibility="collapsed")
+                    st.text_area(f"화학_{idx}", value=process['hazardous_material'], height=100, disabled=True, label_visibility="collapsed")
                 
-                # 화학물질 취급량/일
+                # 취급량/일
                 with cols[4]:
-                    st.text_input(f"화학취급량_{idx}", placeholder="", label_visibility="collapsed")
+                    st.text_input(f"취급량_{idx}", placeholder="", label_visibility="collapsed")
                 
                 # 취급시간
                 with cols[5]:
@@ -560,7 +564,7 @@ with tab3:
                 with cols[10]:
                     st.text_input(f"운반_{idx}", placeholder="", label_visibility="collapsed")
                 
-                # 안전작업허가증유무
+                # 안전작업허가증필요작업
                 with cols[11]:
                     st.selectbox(f"허가증_{idx}", ["", "유", "무"], label_visibility="collapsed")
                 
@@ -568,10 +572,14 @@ with tab3:
                 with cols[12]:
                     st.selectbox(f"측정_{idx}", ["", "유", "무"], label_visibility="collapsed")
                 
-                # 특별안전교육대상 (별도 행, 전체 너비)
-                st.text_input(f"특별교육_{idx}", placeholder="특별안전교육대상", label_visibility="collapsed", key=f"special_edu_{idx}")
+                # 특별안전교육대상 (별도 행, 마지막 2개 컬럼 아래)
+                edu_cols = st.columns([8.3, 1.6])
+                with edu_cols[0]:
+                    st.markdown("")  # 빈 공간
+                with edu_cols[1]:
+                    st.text_input(f"특별교육_{idx}", placeholder="특별안전교육대상", label_visibility="collapsed", key=f"special_edu_{idx}")
                 
-                st.markdown('<hr style="margin: 5px 0; border: 0; border-top: 1px solid #e5e7eb;">', unsafe_allow_html=True)
+                st.markdown('<hr style="margin: 10px 0; border: 0; border-top: 1px solid #e5e7eb;">', unsafe_allow_html=True)
 
 # 사이드바에 도움말 추가
 with st.sidebar:
