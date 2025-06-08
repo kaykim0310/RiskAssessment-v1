@@ -330,7 +330,6 @@ with tab2:
         
         # 왼쪽 헤더 열
         with cols[0]:
-            st.markdown('<div style="margin-top: 40px; height: 40px;"></div>', unsafe_allow_html=True)
             st.markdown('<div style="background-color: #f3f4f6; padding: 15px 10px; border: 1px solid #d1d5db; font-weight: bold; text-align: center; height: 45px; display: flex; align-items: center; justify-content: center;">공정명</div>', unsafe_allow_html=True)
             st.markdown('<div style="margin-top: 10px;"></div>', unsafe_allow_html=True)
             st.markdown('<div style="background-color: #f3f4f6; padding: 15px 10px; border: 1px solid #d1d5db; font-weight: bold; text-align: center; height: 150px; display: flex; align-items: center; justify-content: center;">공정사진</div>', unsafe_allow_html=True)
@@ -346,12 +345,6 @@ with tab2:
         # 각 공정별 입력 필드
         for col_idx, process_idx in enumerate(process_group):
             with cols[col_idx + 1]:
-                # 화살표 표시 (각 그룹의 첫 번째 공정 제외)
-                if col_idx > 0 or (group_idx > 0 and col_idx == 0):
-                    st.markdown('<div style="text-align: center; font-size: 30px; color: #ef4444; height: 40px;">↑</div>', unsafe_allow_html=True)
-                else:
-                    st.markdown('<div style="height: 40px;"></div>', unsafe_allow_html=True)
-                
                 # 공정명
                 st.session_state.processes[process_idx]['name'] = st.text_input(
                     f"공정명 {process_idx+1}",
@@ -361,8 +354,11 @@ with tab2:
                     label_visibility="collapsed"
                 )
                 
-                # 간격
-                st.markdown('<div style="margin: 10px 0;"></div>', unsafe_allow_html=True)
+                # 화살표 표시 (각 그룹의 첫 번째 공정 제외)
+                if col_idx > 0 or (group_idx > 0 and col_idx == 0):
+                    st.markdown('<div style="text-align: center; font-size: 20px; color: #6b7280; margin: 5px 0;">→</div>', unsafe_allow_html=True)
+                else:
+                    st.markdown('<div style="margin: 5px 0; height: 28px;"></div>', unsafe_allow_html=True)
                 
                 # 공정사진
                 photo = st.file_uploader(
