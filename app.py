@@ -325,27 +325,14 @@ with tab2:
         # 이 그룹의 공정 수 (최대 5개)
         group_size = len(process_group)
         
-        # 컬럼 생성 (헤더 + 공정들)
-        cols = st.columns([1.5] + [2] * group_size)
-        
-        # 왼쪽 헤더 열
-        with cols[0]:
-            st.markdown('<div style="background-color: #f3f4f6; padding: 15px 10px; border: 1px solid #d1d5db; font-weight: bold; text-align: center; height: 45px; display: flex; align-items: center; justify-content: center;">공정명</div>', unsafe_allow_html=True)
-            st.markdown('<div style="margin-top: 10px;"></div>', unsafe_allow_html=True)
-            st.markdown('<div style="background-color: #f3f4f6; padding: 15px 10px; border: 1px solid #d1d5db; font-weight: bold; text-align: center; height: 150px; display: flex; align-items: center; justify-content: center;">공정사진</div>', unsafe_allow_html=True)
-            st.markdown('<div style="margin-top: 10px;"></div>', unsafe_allow_html=True)
-            st.markdown('<div style="background-color: #f3f4f6; padding: 15px 10px; border: 1px solid #d1d5db; font-weight: bold; text-align: center; height: 100px; display: flex; align-items: center; justify-content: center;">공정설명</div>', unsafe_allow_html=True)
-            st.markdown('<div style="margin-top: 10px;"></div>', unsafe_allow_html=True)
-            st.markdown('<div style="background-color: #f3f4f6; padding: 15px 10px; border: 1px solid #d1d5db; font-weight: bold; text-align: center; height: 100px; display: flex; align-items: center; justify-content: center;">주요기계<br>기구</div>', unsafe_allow_html=True)
-            st.markdown('<div style="margin-top: 10px;"></div>', unsafe_allow_html=True)
-            st.markdown('<div style="background-color: #f3f4f6; padding: 15px 10px; border: 1px solid #d1d5db; font-weight: bold; text-align: center; height: 100px; display: flex; align-items: center; justify-content: center;">유해위험<br>물질</div>', unsafe_allow_html=True)
-            st.markdown('<div style="margin-top: 10px;"></div>', unsafe_allow_html=True)
-            st.markdown('<div style="background-color: #f3f4f6; padding: 15px 10px; border: 1px solid #d1d5db; font-weight: bold; text-align: center; height: 100px; display: flex; align-items: center; justify-content: center;">유해위험<br>요인</div>', unsafe_allow_html=True)
+        # 컬럼 생성 (공정들만)
+        cols = st.columns(group_size)
         
         # 각 공정별 입력 필드
         for col_idx, process_idx in enumerate(process_group):
-            with cols[col_idx + 1]:
+            with cols[col_idx]:
                 # 공정명
+                st.markdown('<div style="font-weight: bold; margin-bottom: 5px;">공정명</div>', unsafe_allow_html=True)
                 st.session_state.processes[process_idx]['name'] = st.text_input(
                     f"공정명 {process_idx+1}",
                     value=st.session_state.processes[process_idx]['name'],
@@ -361,6 +348,7 @@ with tab2:
                     st.markdown('<div style="margin: 5px 0; height: 28px;"></div>', unsafe_allow_html=True)
                 
                 # 공정사진
+                st.markdown('<div style="font-weight: bold; margin-bottom: 5px;">공정사진</div>', unsafe_allow_html=True)
                 photo = st.file_uploader(
                     f"공정사진 {process_idx+1}",
                     type=['png', 'jpg', 'jpeg'],
@@ -377,6 +365,7 @@ with tab2:
                 st.markdown('<div style="margin: 10px 0;"></div>', unsafe_allow_html=True)
                 
                 # 공정설명
+                st.markdown('<div style="font-weight: bold; margin-bottom: 5px;">공정설명</div>', unsafe_allow_html=True)
                 st.session_state.processes[process_idx]['description'] = st.text_area(
                     f"공정설명 {process_idx+1}",
                     value=st.session_state.processes[process_idx]['description'],
@@ -390,6 +379,7 @@ with tab2:
                 st.markdown('<div style="margin: 10px 0;"></div>', unsafe_allow_html=True)
                 
                 # 주요기계기구
+                st.markdown('<div style="font-weight: bold; margin-bottom: 5px;">주요기계기구</div>', unsafe_allow_html=True)
                 st.session_state.processes[process_idx]['equipment'] = st.text_area(
                     f"주요기계기구 {process_idx+1}",
                     value=st.session_state.processes[process_idx]['equipment'],
@@ -403,6 +393,7 @@ with tab2:
                 st.markdown('<div style="margin: 10px 0;"></div>', unsafe_allow_html=True)
                 
                 # 유해위험물질
+                st.markdown('<div style="font-weight: bold; margin-bottom: 5px;">유해위험물질</div>', unsafe_allow_html=True)
                 st.session_state.processes[process_idx]['hazardous_material'] = st.text_area(
                     f"유해위험물질 {process_idx+1}",
                     value=st.session_state.processes[process_idx]['hazardous_material'],
@@ -416,6 +407,7 @@ with tab2:
                 st.markdown('<div style="margin: 10px 0;"></div>', unsafe_allow_html=True)
                 
                 # 유해위험요인
+                st.markdown('<div style="font-weight: bold; margin-bottom: 5px;">유해위험요인</div>', unsafe_allow_html=True)
                 st.session_state.processes[process_idx]['hazardous_factor'] = st.text_area(
                     f"유해위험요인 {process_idx+1}",
                     value=st.session_state.processes[process_idx]['hazardous_factor'],
