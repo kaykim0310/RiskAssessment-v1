@@ -418,7 +418,134 @@ with tab2:
                 )
 
 with tab3:
-    st.info("🚧 평가서 페이지는 개발 중입니다...")
+    st.markdown('<h2 style="text-align: center; color: #1f2937;">안전보건상 위험정보</h2>', unsafe_allow_html=True)
+    
+    # 세션 상태 초기화 - 위험정보
+    if 'safety_info' not in st.session_state:
+        st.session_state.safety_info = {
+            'industry': '',
+            'raw_materials': '',
+            'products': '',
+            'transport': '',
+            'workers': '',
+            'special_education': '',
+            'safety_permit': '',
+            'work_measurement': '',
+            'near_miss': '',
+            'accidents_3years': '',
+            'contract_shift': ''
+        }
+    
+    # 4개 열로 나누어 표시
+    col1, col2, col3, col4 = st.columns([1.5, 3, 1.5, 3])
+    
+    # 첫 번째 열
+    with col1:
+        st.markdown('<div style="background-color: #fef3c7; padding: 10px; border: 1px solid #d97706; font-weight: bold;">업종명</div>', unsafe_allow_html=True)
+        st.markdown('<div style="background-color: #fef3c7; padding: 10px; border: 1px solid #d97706; font-weight: bold; margin-top: 10px;">원(재)료</div>', unsafe_allow_html=True)
+        st.markdown('<div style="background-color: #fef3c7; padding: 10px; border: 1px solid #d97706; font-weight: bold; margin-top: 10px;">생산품</div>', unsafe_allow_html=True)
+        st.markdown('<div style="background-color: #fef3c7; padding: 10px; border: 1px solid #d97706; font-weight: bold; margin-top: 10px;">운반수단</div>', unsafe_allow_html=True)
+        st.markdown('<div style="background-color: #fef3c7; padding: 23px 10px; border: 1px solid #d97706; font-weight: bold; margin-top: 10px;">근로자<br>구성 및 특성</div>', unsafe_allow_html=True)
+        st.markdown('<div style="background-color: #fef3c7; padding: 23px 10px; border: 1px solid #d97706; font-weight: bold; margin-top: 10px;">특별안전교육<br>대상</div>', unsafe_allow_html=True)
+        st.markdown('<div style="background-color: #fef3c7; padding: 23px 10px; border: 1px solid #d97706; font-weight: bold; margin-top: 10px;">안전작업<br>허가증<br>필요작업</div>', unsafe_allow_html=True)
+    
+    # 두 번째 열
+    with col2:
+        st.session_state.safety_info['industry'] = st.text_input("업종명", value=st.session_state.safety_info['industry'], label_visibility="collapsed")
+        st.markdown('<div style="margin-top: 10px;"></div>', unsafe_allow_html=True)
+        st.session_state.safety_info['raw_materials'] = st.text_input("원재료", value=st.session_state.safety_info['raw_materials'], label_visibility="collapsed")
+        st.markdown('<div style="margin-top: 10px;"></div>', unsafe_allow_html=True)
+        st.session_state.safety_info['products'] = st.text_input("생산품", value=st.session_state.safety_info['products'], label_visibility="collapsed")
+        st.markdown('<div style="margin-top: 10px;"></div>', unsafe_allow_html=True)
+        st.session_state.safety_info['transport'] = st.text_input("운반수단", value=st.session_state.safety_info['transport'], label_visibility="collapsed")
+        st.markdown('<div style="margin-top: 10px;"></div>', unsafe_allow_html=True)
+        st.session_state.safety_info['workers'] = st.text_area("근로자 구성", value=st.session_state.safety_info['workers'], height=70, label_visibility="collapsed")
+        st.markdown('<div style="margin-top: 10px;"></div>', unsafe_allow_html=True)
+        st.session_state.safety_info['special_education'] = st.text_area("특별안전교육", value=st.session_state.safety_info['special_education'], height=70, label_visibility="collapsed")
+        st.markdown('<div style="margin-top: 10px;"></div>', unsafe_allow_html=True)
+        st.session_state.safety_info['safety_permit'] = st.text_area("안전작업허가증", value=st.session_state.safety_info['safety_permit'], height=70, label_visibility="collapsed")
+    
+    # 세 번째 열
+    with col3:
+        st.markdown('<div style="background-color: #fef3c7; padding: 10px; border: 1px solid #d97706; font-weight: bold;">작업환경측정유무</div>', unsafe_allow_html=True)
+        st.markdown('<div style="background-color: #fef3c7; padding: 32px 10px; border: 1px solid #d97706; font-weight: bold; margin-top: 10px;">앗차사고<br>사례</div>', unsafe_allow_html=True)
+        st.markdown('<div style="background-color: #fef3c7; padding: 32px 10px; border: 1px solid #d97706; font-weight: bold; margin-top: 10px;">3년간<br>재해사례</div>', unsafe_allow_html=True)
+        st.markdown('<div style="background-color: #fef3c7; padding: 23px 10px; border: 1px solid #d97706; font-weight: bold; margin-top: 10px;">도급/교대<br>작업유무</div>', unsafe_allow_html=True)
+    
+    # 네 번째 열
+    with col4:
+        st.session_state.safety_info['work_measurement'] = st.text_input("작업환경측정", value=st.session_state.safety_info['work_measurement'], label_visibility="collapsed")
+        st.markdown('<div style="margin-top: 10px;"></div>', unsafe_allow_html=True)
+        st.session_state.safety_info['near_miss'] = st.text_area("앗차사고", value=st.session_state.safety_info['near_miss'], height=85, label_visibility="collapsed")
+        st.markdown('<div style="margin-top: 10px;"></div>', unsafe_allow_html=True)
+        st.session_state.safety_info['accidents_3years'] = st.text_area("3년간 재해", value=st.session_state.safety_info['accidents_3years'], height=85, label_visibility="collapsed")
+        st.markdown('<div style="margin-top: 10px;"></div>', unsafe_allow_html=True)
+        st.session_state.safety_info['contract_shift'] = st.text_area("도급/교대작업", value=st.session_state.safety_info['contract_shift'], height=70, label_visibility="collapsed")
+    
+    # 구분선
+    st.markdown('<hr style="margin: 30px 0;">', unsafe_allow_html=True)
+    
+    # 공정(작업)순서 표
+    st.markdown('<h3 style="text-align: center; color: #1f2937;">공정(작업)순서</h3>', unsafe_allow_html=True)
+    
+    # 2페이지에서 입력한 공정 정보 가져오기
+    if 'processes' in st.session_state:
+        # 테이블 헤더
+        header_cols = st.columns([1.5, 1, 1, 2, 1, 1, 2, 1, 1])
+        
+        with header_cols[0]:
+            st.markdown('<div style="background-color: #fef3c7; padding: 10px; border: 1px solid #d97706; font-weight: bold; text-align: center;">공정<br>(작업)순서</div>', unsafe_allow_html=True)
+        with header_cols[1]:
+            st.markdown('<div style="background-color: #fef3c7; padding: 10px; border: 1px solid #d97706; font-weight: bold; text-align: center;">취급시간</div>', unsafe_allow_html=True)
+        with header_cols[2]:
+            st.markdown('<div style="background-color: #fef3c7; padding: 10px; border: 1px solid #d97706; font-weight: bold; text-align: center; font-size: 12px;">기계기구 및<br>설비명</div>', unsafe_allow_html=True)
+        with header_cols[3]:
+            st.markdown('<div style="background-color: #fef3c7; padding: 10px; border: 1px solid #d97706; font-weight: bold; text-align: center;">기계기구 및 설비명</div>', unsafe_allow_html=True)
+        with header_cols[4]:
+            st.markdown('<div style="background-color: #fef3c7; padding: 10px; border: 1px solid #d97706; font-weight: bold; text-align: center;">수량</div>', unsafe_allow_html=True)
+        with header_cols[5]:
+            st.markdown('<div style="background-color: #fef3c7; padding: 10px; border: 1px solid #d97706; font-weight: bold; text-align: center; font-size: 12px;">유해화학<br>물질</div>', unsafe_allow_html=True)
+        with header_cols[6]:
+            st.markdown('<div style="background-color: #fef3c7; padding: 10px; border: 1px solid #d97706; font-weight: bold; text-align: center;">화학물질명</div>', unsafe_allow_html=True)
+        with header_cols[7]:
+            st.markdown('<div style="background-color: #fef3c7; padding: 10px; border: 1px solid #d97706; font-weight: bold; text-align: center;">취급량/일</div>', unsafe_allow_html=True)
+        with header_cols[8]:
+            st.markdown('<div style="background-color: #fef3c7; padding: 10px; border: 1px solid #d97706; font-weight: bold; text-align: center;">기타</div>', unsafe_allow_html=True)
+        
+        # 각 공정별 데이터 입력
+        for idx, process in enumerate(st.session_state.processes):
+            if process['name']:  # 공정명이 입력된 경우만 표시
+                data_cols = st.columns([1.5, 1, 1, 2, 1, 1, 2, 1, 1])
+                
+                with data_cols[0]:
+                    # 2페이지의 공정명 자동 입력
+                    st.text_input(f"공정순서_{idx}", value=process['name'], disabled=True, label_visibility="collapsed")
+                
+                with data_cols[1]:
+                    st.text_input(f"취급시간_{idx}", placeholder="시간", label_visibility="collapsed")
+                
+                with data_cols[2]:
+                    st.markdown('<div style="text-align: center; padding: 10px;">↓</div>', unsafe_allow_html=True)
+                
+                with data_cols[3]:
+                    # 2페이지의 주요기계기구 자동 입력
+                    st.text_area(f"기계기구_{idx}", value=process['equipment'], height=70, label_visibility="collapsed")
+                
+                with data_cols[4]:
+                    st.text_input(f"수량_{idx}", placeholder="수량", label_visibility="collapsed")
+                
+                with data_cols[5]:
+                    st.markdown('<div style="text-align: center; padding: 10px;">↓</div>', unsafe_allow_html=True)
+                
+                with data_cols[6]:
+                    # 2페이지의 유해위험물질 자동 입력
+                    st.text_area(f"화학물질_{idx}", value=process['hazardous_material'], height=70, label_visibility="collapsed")
+                
+                with data_cols[7]:
+                    st.text_input(f"취급량_{idx}", placeholder="kg/일", label_visibility="collapsed")
+                
+                with data_cols[8]:
+                    st.text_input(f"기타_{idx}", placeholder="비고", label_visibility="collapsed")
 
 # 사이드바에 도움말 추가
 with st.sidebar:
