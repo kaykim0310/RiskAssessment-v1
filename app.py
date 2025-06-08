@@ -1063,116 +1063,103 @@ with tab4:
                 </style>
                 """, unsafe_allow_html=True)
                 
-                # 공정별 테이블 생성
+                # 테이블 헤더와 입력 필드
                 st.markdown(f"""
-                <div style="margin-bottom: 30px;">
-                    <!-- 상단 테이블 헤더 -->
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 0;">
-                        <tr>
-                            <td style="border: 1px solid #000; background-color: #fef3c7; text-align: center; font-weight: bold; padding: 10px; width: 10%;">
-                                제조 공정
-                            </td>
-                            <td style="border: 1px solid #000; background-color: white; padding: 10px; width: 10%;">
-                                &nbsp;
-                            </td>
-                            <td style="border: 1px solid #000; background-color: #fef3c7; text-align: center; font-weight: bold; font-size: 18px; padding: 10px;">
-                                유해위험요인 분류
-                            </td>
-                            <td style="border: 1px solid #000; background-color: #fef3c7; text-align: center; font-weight: bold; padding: 10px; width: 10%;">
-                                세부 공정
-                            </td>
-                            <td style="border: 1px solid #000; background-color: white; padding: 10px; width: 10%;">
-                                &nbsp;
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="border: 1px solid #000; background-color: white; padding: 10px; text-align: center;">
-                                &nbsp;
-                            </td>
-                            <td style="border: 1px solid #000; background-color: white; padding: 10px;">
-                                &nbsp;
-                            </td>
-                            <td style="border: 1px solid #000; background-color: white; padding: 10px;">
-                                &nbsp;
-                            </td>
-                            <td style="border: 1px solid #000; background-color: #fef3c7; text-align: center; font-weight: bold; padding: 10px;">
-                                분류 코드
-                            </td>
-                            <td style="border: 1px solid #000; background-color: white; padding: 10px;">
-                                &nbsp;
-                            </td>
-                        </tr>
-                    </table>
-                    
-                    <!-- 메인 유해위험요인 분류 테이블 -->
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <tr>
-                            <th style="border: 1px solid #000; background-color: #fef3c7; text-align: center; padding: 10px; width: 5%;">분류</th>
-                            <th style="border: 1px solid #000; background-color: #fef3c7; text-align: center; padding: 10px; width: 15%;">분야</th>
-                            <th colspan="3" style="border: 1px solid #000; background-color: #fef3c7; text-align: center; padding: 10px;">유해위험요인</th>
-                        </tr>
-                    </table>
-                </div>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="border: 1px solid #000; background-color: #fef3c7; text-align: center; font-weight: bold; padding: 10px; width: 10%;">
+                            제조 공정
+                        </td>
+                        <td style="border: 1px solid #000; background-color: white; padding: 10px; width: 10%;">
+                        </td>
+                        <td style="border: 1px solid #000; background-color: #fef3c7; text-align: center; font-weight: bold; font-size: 18px; padding: 10px;">
+                            유해위험요인 분류
+                        </td>
+                        <td style="border: 1px solid #000; background-color: #fef3c7; text-align: center; font-weight: bold; padding: 10px; width: 10%;">
+                            세부 공정
+                        </td>
+                        <td style="border: 1px solid #000; background-color: white; padding: 10px; width: 10%;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #000; background-color: white; padding: 10px;">
+                        </td>
+                        <td style="border: 1px solid #000; background-color: white; padding: 10px;">
+                        </td>
+                        <td style="border: 1px solid #000; background-color: white; padding: 10px;">
+                        </td>
+                        <td style="border: 1px solid #000; background-color: #fef3c7; text-align: center; font-weight: bold; padding: 10px;">
+                            분류 코드
+                        </td>
+                        <td style="border: 1px solid #000; background-color: white; padding: 10px;">
+                        </td>
+                    </tr>
+                </table>
                 """, unsafe_allow_html=True)
                 
                 # 상단 입력 필드
-                cols = st.columns([1, 1, 5, 1, 1])
-                with cols[1]:
-                    st.text_input(f"제조공정_입력_{process_key}", label_visibility="collapsed", key=f"mfg_input_{process_key}")
-                with cols[3]:
-                    st.text_input(f"세부공정_값_{process_key}", value=process['name'], disabled=True, label_visibility="collapsed", key=f"subprocess_value_{process_key}")
-                with cols[4]:
-                    st.text_input(f"분류코드_입력_{process_key}", label_visibility="collapsed", key=f"classcode_input_{process_key}")
+                cols_top = st.columns([1, 1, 3, 1, 1])
+                with cols_top[1]:
+                    st.text_input("", label_visibility="collapsed", key=f"mfg_input_{process_key}")
+                with cols_top[3]:
+                    st.text_input("", value=process['name'], disabled=True, label_visibility="collapsed", key=f"subprocess_auto_{process_key}")
+                with cols_top[4]:
+                    st.text_input("", label_visibility="collapsed", key=f"classcode_input_{process_key}")
+                
+                # 유해위험요인 분류 테이블
+                st.markdown("""
+                <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                    <tr>
+                        <th style="border: 1px solid #000; background-color: #fef3c7; text-align: center; padding: 10px; width: 5%;">분류</th>
+                        <th style="border: 1px solid #000; background-color: #fef3c7; text-align: center; padding: 10px; width: 15%;">분야</th>
+                        <th colspan="3" style="border: 1px solid #000; background-color: #fef3c7; text-align: center; padding: 10px;">유해위험요인</th>
+                    </tr>
+                </table>
+                """, unsafe_allow_html=True)
                 
                 # 각 카테고리별로 행 생성
                 for category_idx, (category, items) in enumerate(hazard_categories.items()):
-                    # 전체 행 수 계산
-                    total_rows = len(items)
+                    row_count = len(items)
                     
-                    for item_idx, item_tuple in enumerate(items):
-                        # 튜플의 3개 항목을 순서대로 처리
-                        cols = st.columns([0.5, 1.5, 1.5, 1.5, 1.5])
+                    for row_idx, item_tuple in enumerate(items):
+                        cols = st.columns([0.5, 1.5, 2.5, 2.5, 2.5])
                         
-                        # 분류 번호 (각 카테고리의 첫 번째 행에만 표시)
+                        # 분류 번호 (카테고리당 한 번만)
                         with cols[0]:
-                            if item_idx == 0:
+                            if row_idx == 0:
                                 st.markdown(f"""
-                                <div style="border: 1px solid #000; background-color: #fef3c7; text-align: center; 
-                                           padding: {20 * total_rows}px 10px; font-weight: bold;">
+                                <div style="border: 1px solid #000; background-color: #fef3c7; 
+                                           text-align: center; padding: {25 * row_count}px 5px; 
+                                           font-weight: bold; height: {50 * row_count}px;
+                                           display: flex; align-items: center; justify-content: center;">
                                     {category_idx + 1}
                                 </div>
                                 """, unsafe_allow_html=True)
                         
-                        # 분야 (각 카테고리의 첫 번째 행에만 표시)
+                        # 분야 (카테고리당 한 번만)
                         with cols[1]:
-                            if item_idx == 0:
+                            if row_idx == 0:
                                 st.markdown(f"""
-                                <div style="border: 1px solid #000; background-color: #fef3c7; text-align: center; 
-                                           padding: {20 * total_rows}px 10px; font-weight: bold;">
+                                <div style="border: 1px solid #000; background-color: #fef3c7; 
+                                           text-align: center; padding: {25 * row_count}px 5px; 
+                                           font-weight: bold; height: {50 * row_count}px;
+                                           display: flex; align-items: center; justify-content: center;">
                                     {category}
                                 </div>
                                 """, unsafe_allow_html=True)
                         
-                        # 3개의 체크박스 항목
+                        # 3개의 체크박스
                         for sub_idx in range(3):
                             with cols[2 + sub_idx]:
                                 if sub_idx < len(item_tuple) and item_tuple[sub_idx]:
-                                    checked = st.checkbox(
+                                    st.checkbox(
                                         item_tuple[sub_idx], 
-                                        key=f"check_{process_key}_{category_idx}_{item_idx}_{sub_idx}",
-                                        label_visibility="visible"
+                                        key=f"cb_{process_key}_{category_idx}_{row_idx}_{sub_idx}"
                                     )
-                                    
-                                    if checked:
-                                        key = f"{process_key}_{category_idx}_{item_idx}_{sub_idx}"
-                                        if key not in st.session_state.hazard_classifications[process_key]:
-                                            st.session_state.hazard_classifications[process_key][key] = {}
-                                        st.session_state.hazard_classifications[process_key][key]['item'] = item_tuple[sub_idx]
-                                        st.session_state.hazard_classifications[process_key][key]['checked'] = True
                                 else:
-                                    st.write("")  # 빈 공간
+                                    st.write("")
                 
-                st.markdown('<hr style="margin: 30px 0; border: 2px solid #1f2937;">', unsafe_allow_html=True)
+                st.markdown('<hr style="margin: 30px 0; border: 2px solid #000;">', unsafe_allow_html=True)
     
     # 데이터 저장 버튼
     st.markdown('<br>', unsafe_allow_html=True)
