@@ -1348,7 +1348,8 @@ with tab4:
             # 다운로드 링크 생성
             output.seek(0)
             b64 = base64.b64encode(output.read()).decode()
-            href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="위험성평가_유해위험요인분류_{datetime.now().strftime("%Y%m%d")}.xlsx">📥 엑셀 파일 다운로드</a>'
+            download_filename = f"위험성평가_유해위험요인분류_{datetime.now().strftime('%Y%m%d')}.xlsx"
+            href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="{download_filename}">📥 엑셀 파일 다운로드</a>'
             st.markdown(href, unsafe_allow_html=True)
             st.success("유해위험요인 분류가 엑셀 파일로 저장되었습니다!")* row_count}px 5px; 
                                                font-weight: bold; height: {50 * row_count}px;
