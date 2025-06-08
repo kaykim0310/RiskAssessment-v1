@@ -760,62 +760,211 @@ with tab3:
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
         if st.button("💾 위험정보 엑셀 저장", use_container_width=True, key="save_tab3"):
-            # 상단 정보
-            header_data = {
-                '업종명': st.session_state.get('industry_name', ''),
-                '생산품': st.session_state.get('product_name', ''),
-                '원재료': st.session_state.get('raw_material', ''),
-                '근로자': st.session_state.get('workers_info', '')
-            }
-            
-            # 엑셀 파일 생성
             output = BytesIO()
+            
             with pd.ExcelWriter(output, engine='openpyxl') as writer:
-                # 헤더 정보
-                df_header = pd.DataFrame([header_data])
-                df_header.to_excel(writer, sheet_name='기본정보', index=False)
+                # 빈 데이터프레임으로 시트 생성
+                df = pd.DataFrame()
+                df.to_excel(writer, sheet_name='위험정보', index=False)
                 
-                # 공정 정보
-                if process_data_list:
-                    df_process = pd.DataFrame(process_data_list)
-                    df_process.to_excel(writer, sheet_name='공정정보', index=False)
+                workbook = writer.book
+                worksheet = writer.sheets['위험정보']
                 
                 # 서식 설정
                 from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
+                from openpyxl.utils import get_column_letter
                 
                 header_fill = PatternFill(start_color='FEF3C7', end_color='FEF3C7', fill_type='solid')
-                header_font = Font(bold=True, size=12)
-                header_alignment = Alignment(horizontal='center', vertical='center')
                 thin_border = Border(
                     left=Side(style='thin'),
                     right=Side(style='thin'),
                     top=Side(style='thin'),
                     bottom=Side(style='thin')
                 )
+                center_align = Alignment(horizontal='center', vertical='center', wrap_text=True)
+                left_align = Alignment(horizontal='left', vertical='center', wrap_text=True)
                 
-                # 각 시트에 서식 적용
-                for sheet_name in writer.sheets:
-                    worksheet = writer.sheets[sheet_name]
-                    
-                    # 헤더 서식
-                    for cell in worksheet[1]:
-                        cell.fill = header_fill
-                        cell.font = header_font
-                        cell.alignment = header_alignment
-                        cell.border = thin_border
-                    
-                    # 열 너비 자동 조정
-                    for column in worksheet.columns:
-                        max_length = 0
-                        column = [cell for cell in column]
-                        for cell in column:
-                            try:
-                                if len(str(cell.value)) > max_length:
-                                    max_length = len(str(cell.value))
-                            except:
-                                pass
-                        adjusted_width = (max_length + 2) * 1.2
-                        worksheet.column_dimensions[column[0].column_letter].width = adjusted_width
+                # 상단 정보 테이블
+                current_row = 1
+                
+                # 업종명, 생산품
+                worksheet['A1'].value = "업종명"
+                worksheet['A1'].fill = header_fill
+                worksheet['A1'].alignment = center_align
+                worksheet['A1'].border = thin_border
+                
+                worksheet.merge_cells('B1:C1')
+                worksheet['B1'].value = st.session_state.get('industry_name', '')
+                worksheet['B1'].alignment = center_align
+                worksheet['B1'].border = thin_border
+                
+                worksheet['D1'].value = "생산품"
+                worksheet['D1'].fill = header_fill
+                worksheet['D1'].alignment = center_align
+                worksheet['D1'].border = thin_border
+                
+                worksheet.merge_cells('E1:F1')
+                worksheet['E1'].value = st.session_state.get('product_name', '')
+                worksheet['E1'].alignment = center_align
+                worksheet['E1'].border = thin_border
+                
+                # 원(재)료, 근로자
+                worksheet['A2'].value = "원(재)료"
+                worksheet['A2'].fill = header_fill
+                worksheet['A2'].alignment = center_align
+                worksheet['A2'].border = thin_border
+                
+                worksheet.merge_cells('B2:C2')
+                worksheet['B2'].value = st.session_state.get('raw_material', '')
+                worksheet['B2'].alignment = center_align
+                worksheet['B2'].border = thin_border
+                
+                worksheet['D2'].value = "근로자"
+                worksheet['D2'].fill = header_fill
+                worksheet['D2'].alignment = center_align
+                worksheet['D2'].border = thin_border
+                
+                worksheet.merge_cells('E2:F2')
+                worksheet['E2'].value = st.session_state.get('workers_info', '')
+                worksheet['E2'].alignment = center_align
+                worksheet['E2'].border = thin_border
+                
+                # 공정(작업)순서 테이블 헤더
+                current_row = 4
+                
+                # 첫 번째 행
+                worksheet.merge_cells(f'A{current_row}:A{current_row+1}')
+                worksheet[f'A{current_row}'].value = "공정\n(작업)순서"
+                worksheet[f'A{current_row}'].fill = header_fill
+                worksheet[f'A{current_row}'].alignment = center_align
+                worksheet[f'A{current_row}'].border = thin_border
+                
+                worksheet.merge_cells(f'B{current_row}:C{current_row}')
+                worksheet[f'B{current_row}'].value = "기계기구 및 설비명"
+                worksheet[f'B{current_row}'].fill = header_fill
+                worksheet[f'B{current_row}'].alignment = center_align
+                worksheet[f'B{current_row}'].border = thin_border
+                
+                worksheet.merge_cells(f'D{current_row}:F{current_row}')
+                worksheet[f'D{current_row}'].value = "유해화학물질"
+                worksheet[f'D{current_row}'].fill = header_fill
+                worksheet[f'D{current_row}'].alignment = center_align
+                worksheet[f'D{current_row}'].border = thin_border
+                
+                worksheet.merge_cells(f'G{current_row}:N{current_row}')
+                worksheet[f'G{current_row}'].value = "기타 안전보건상 정보"
+                worksheet[f'G{current_row}'].fill = header_fill
+                worksheet[f'G{current_row}'].alignment = center_align
+                worksheet[f'G{current_row}'].border = thin_border
+                
+                # 두 번째 행
+                current_row += 1
+                headers = ['기계기구 및\n설비명', '수량', '화학물질명', '취급량/일', '취급시간',
+                          '3년간\n재해사례', '앗차\n사고사례', '근로자\n구성및특성', '도급/교대\n작업유무',
+                          '운반수단', '안전작업\n허가증\n필요작업', '작업환경\n측정유무', '특별안전\n교육대상']
+                
+                col_idx = 1  # B열부터 시작
+                for header in headers:
+                    cell = worksheet[f'{get_column_letter(col_idx+1)}{current_row}']
+                    cell.value = header
+                    cell.fill = header_fill
+                    cell.alignment = center_align
+                    cell.border = thin_border
+                    col_idx += 1
+                
+                # 데이터 입력
+                current_row += 1
+                
+                if 'processes' in st.session_state:
+                    for idx, process in enumerate(st.session_state.processes):
+                        if process['name']:
+                            # 공정(작업)순서
+                            worksheet[f'A{current_row}'].value = process['name']
+                            worksheet[f'A{current_row}'].alignment = center_align
+                            worksheet[f'A{current_row}'].border = thin_border
+                            
+                            # 기계기구 및 설비명
+                            worksheet[f'B{current_row}'].value = process['equipment']
+                            worksheet[f'B{current_row}'].alignment = left_align
+                            worksheet[f'B{current_row}'].border = thin_border
+                            
+                            # 수량
+                            worksheet[f'C{current_row}'].value = st.session_state.get(f'qty_{idx}', '')
+                            worksheet[f'C{current_row}'].alignment = center_align
+                            worksheet[f'C{current_row}'].border = thin_border
+                            
+                            # 화학물질명
+                            worksheet[f'D{current_row}'].value = process['hazardous_material']
+                            worksheet[f'D{current_row}'].alignment = left_align
+                            worksheet[f'D{current_row}'].border = thin_border
+                            
+                            # 취급량/일
+                            worksheet[f'E{current_row}'].value = st.session_state.get(f'amount_{idx}', '')
+                            worksheet[f'E{current_row}'].alignment = center_align
+                            worksheet[f'E{current_row}'].border = thin_border
+                            
+                            # 취급시간
+                            worksheet[f'F{current_row}'].value = st.session_state.get(f'time_{idx}', '')
+                            worksheet[f'F{current_row}'].alignment = center_align
+                            worksheet[f'F{current_row}'].border = thin_border
+                            
+                            # 3년간 재해사례
+                            worksheet[f'G{current_row}'].value = st.session_state.get(f'accident_{idx}', '')
+                            worksheet[f'G{current_row}'].alignment = center_align
+                            worksheet[f'G{current_row}'].border = thin_border
+                            
+                            # 앗차사고사례
+                            worksheet[f'H{current_row}'].value = st.session_state.get(f'near_miss_{idx}', '')
+                            worksheet[f'H{current_row}'].alignment = center_align
+                            worksheet[f'H{current_row}'].border = thin_border
+                            
+                            # 근로자 구성및특성
+                            worksheet[f'I{current_row}'].value = st.session_state.get(f'workers_{idx}', '')
+                            worksheet[f'I{current_row}'].alignment = center_align
+                            worksheet[f'I{current_row}'].border = thin_border
+                            
+                            # 도급/교대 작업유무
+                            worksheet[f'J{current_row}'].value = st.session_state.get(f'contract_{idx}', '')
+                            worksheet[f'J{current_row}'].alignment = center_align
+                            worksheet[f'J{current_row}'].border = thin_border
+                            
+                            # 운반수단
+                            worksheet[f'K{current_row}'].value = st.session_state.get(f'transport_{idx}', '')
+                            worksheet[f'K{current_row}'].alignment = center_align
+                            worksheet[f'K{current_row}'].border = thin_border
+                            
+                            # 안전작업허가증필요작업
+                            worksheet[f'L{current_row}'].value = st.session_state.get(f'permit_{idx}', '')
+                            worksheet[f'L{current_row}'].alignment = center_align
+                            worksheet[f'L{current_row}'].border = thin_border
+                            
+                            # 작업환경측정유무
+                            worksheet[f'M{current_row}'].value = st.session_state.get(f'measurement_{idx}', '')
+                            worksheet[f'M{current_row}'].alignment = center_align
+                            worksheet[f'M{current_row}'].border = thin_border
+                            
+                            # 특별안전교육대상
+                            worksheet[f'N{current_row}'].value = st.session_state.get(f'special_edu_{idx}', '')
+                            worksheet[f'N{current_row}'].alignment = center_align
+                            worksheet[f'N{current_row}'].border = thin_border
+                            
+                            current_row += 1
+                
+                # 열 너비 조정
+                worksheet.column_dimensions['A'].width = 12
+                worksheet.column_dimensions['B'].width = 20
+                worksheet.column_dimensions['C'].width = 8
+                worksheet.column_dimensions['D'].width = 20
+                worksheet.column_dimensions['E'].width = 10
+                worksheet.column_dimensions['F'].width = 10
+                worksheet.column_dimensions['G'].width = 10
+                worksheet.column_dimensions['H'].width = 10
+                worksheet.column_dimensions['I'].width = 12
+                worksheet.column_dimensions['J'].width = 10
+                worksheet.column_dimensions['K'].width = 10
+                worksheet.column_dimensions['L'].width = 12
+                worksheet.column_dimensions['M'].width = 12
+                worksheet.column_dimensions['N'].width = 12
             
             # 다운로드 링크 생성
             output.seek(0)
@@ -909,49 +1058,28 @@ with tab4:
                 </style>
                 """, unsafe_allow_html=True)
                 
-                # 공정 제목 (위의 공정과 동일한 스타일) - 수정사항 1
+                # 테이블 헤더 - 원본과 동일하게
                 st.markdown(f"""
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 0px;">
+                <table style="width: 100%; border-collapse: collapse;">
                     <tr>
-                        <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 10px; width: 10%;">
+                        <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 10%;">
                             제조 공정
                         </td>
-                        <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 10px; width: 15%;">
+                        <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 15%; color: red;">
                             입력공간
                         </td>
-                        <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 10px;">
+                        <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 15px;">
                             유해위험요인 분류
                         </td>
-                        <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 10px; width: 10%;">
+                        <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 10%;">
                             세부 공정
                         </td>
-                        <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 10px; width: 10%;">
+                        <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 10%;">
                             분류 코드
                         </td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" style="border: 1px solid #1f2937; text-align: center; font-size: 18px; font-weight: bold; padding: 15px; background-color: white;">
-                            공정: {chr(65 + idx)}
+                        <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 10%; color: red;">
+                            입력공간
                         </td>
-                        <td style="border: 1px solid #1f2937; text-align: center; font-size: 14px; padding: 10px; background-color: white;">
-                            공정: {chr(65 + idx)}
-                        </td>
-                        <td style="border: 1px solid #1f2937; text-align: center; font-size: 14px; padding: 10px; background-color: white;">
-                            
-                        </td>
-                    </tr>
-                </table>
-                """, unsafe_allow_html=True)
-                
-                # 테이블 헤더 - 유해위험요인 분류 아래에 하위 헤더 없음
-                st.markdown(f"""
-                <table class="hazard-table" style="margin-top: 0px;">
-                    <tr>
-                        <th style="width: 10%;">제조 공정</th>
-                        <th style="width: 15%;">분류</th>
-                        <th colspan="3" style="width: 55%;">유해위험요인 분류</th>
-                        <th style="width: 10%;">세부 공정</th>
-                        <th style="width: 10%;">분류 코드</th>
                     </tr>
                 </table>
                 """, unsafe_allow_html=True)
@@ -962,8 +1090,8 @@ with tab4:
                     for row_idx in range(0, len(items), 3):
                         row_items = items[row_idx:row_idx+3]
                         
-                        # 행의 각 항목을 표시
-                        cols = st.columns([0.5, 1.2, 0.8, 0.8, 0.8, 2.4, 0.8, 0.8])
+                        # 행의 각 항목을 표시 - 6개 컬럼에 맞춰 조정
+                        cols = st.columns([0.5, 1.0, 0.8, 0.8, 0.8, 2.4, 0.8, 0.8, 1.0])
                         
                         # 분류 번호 (각 카테고리의 첫 번째 행에만 표시)
                         with cols[0]:
@@ -974,8 +1102,15 @@ with tab4:
                                            label_visibility="collapsed",
                                            height=50)
                         
-                        # 분류명 (각 카테고리의 첫 번째 행에만 표시)
+                        # 입력공간 (첫 번째)
                         with cols[1]:
+                            st.text_area(f"입력공간1_{process_key}_{category_idx}_{row_idx}", 
+                                       value="", 
+                                       label_visibility="collapsed",
+                                       height=50)
+                        
+                        # 분류명 (각 카테고리의 첫 번째 행에만 표시)
+                        with cols[2]:
                             if row_idx == 0:
                                 st.text_area(f"분류명_{process_key}_{category_idx}_{row_idx}", 
                                            value=category, 
@@ -986,7 +1121,7 @@ with tab4:
                         # 3개의 체크박스와 유해위험요인 항목
                         for item_idx, item in enumerate(row_items):
                             if item and item[0]:  # 빈 문자열이 아닌 경우만 표시
-                                with cols[2 + item_idx]:
+                                with cols[3 + item_idx]:
                                     # 체크박스와 항목명
                                     checked = st.checkbox(item[0], key=f"check_{process_key}_{category_idx}_{row_idx}_{item_idx}", 
                                                         label_visibility="visible")
@@ -999,7 +1134,7 @@ with tab4:
                                         st.session_state.hazard_classifications[process_key][key]['checked'] = True
                         
                         # 유해 위험 요인 입력란
-                        with cols[5]:
+                        with cols[6]:
                             hazard_input = st.text_area(f"유해위험요인_{process_key}_{category_idx}_{row_idx}", 
                                                       label_visibility="collapsed",
                                                       height=50)
@@ -1011,7 +1146,7 @@ with tab4:
                                     st.session_state.hazard_classifications[process_key][key]['hazard'] = hazard_input
                         
                         # 세부 공정 (첫 번째 카테고리의 첫 번째 행에만 표시)
-                        with cols[6]:
+                        with cols[7]:
                             if category_idx == 0 and row_idx == 0:
                                 st.text_area(f"세부공정_{process_key}", 
                                            value=process['name'], 
@@ -1019,14 +1154,12 @@ with tab4:
                                            label_visibility="collapsed",
                                            height=50)
                         
-                        # 분류 코드 (첫 번째 카테고리의 첫 번째 행에만 표시)
-                        with cols[7]:
-                            if category_idx == 0 and row_idx == 0:
-                                st.text_area(f"분류코드_{process_key}", 
-                                           value=f"공정: {chr(65 + idx)}", 
-                                           disabled=True, 
-                                           label_visibility="collapsed",
-                                           height=50)
+                        # 입력공간 (두 번째)
+                        with cols[8]:
+                            st.text_area(f"입력공간2_{process_key}_{category_idx}_{row_idx}", 
+                                       value="", 
+                                       label_visibility="collapsed",
+                                       height=50)
                         
                         st.markdown('<hr style="margin: 5px 0; border: 0; border-top: 1px solid #e5e7eb;">', unsafe_allow_html=True)
                 
