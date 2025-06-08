@@ -99,18 +99,28 @@ st.markdown("""
     }
     
     .hazard-table .stCheckbox {
-        margin-bottom: 0 !important;
-        padding: 2px 0 !important;
+        margin-bottom: -10px !important;
+        padding: 0px !important;
     }
     
     .hazard-table label {
         margin-bottom: 0 !important;
-        font-size: 14px !important;
+        font-size: 13px !important;
+        padding: 2px 0 !important;
     }
     
     /* 체크박스 간격 조정 */
     .stCheckbox > div {
-        margin-bottom: 5px !important;
+        margin-bottom: -5px !important;
+    }
+    
+    .stCheckbox > label > div {
+        padding: 0 !important;
+    }
+    
+    /* 체크박스 컨테이너 간격 제거 */
+    [data-testid="stVerticalBlock"] > div:has(.stCheckbox) {
+        gap: 0 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -1091,9 +1101,8 @@ with tab4:
                     <tr>
                         <th style="border: 1px solid #000; background-color: #fef3c7; text-align: center; padding: 10px; width: 5%;">분류</th>
                         <th style="border: 1px solid #000; background-color: #fef3c7; text-align: center; padding: 10px; width: 15%;">분야</th>
-                        <th style="border: 1px solid #000; background-color: #fef3c7; text-align: center; padding: 10px;">유해위험요인</th>
-                        <th style="border: 1px solid #000; background-color: white; text-align: center; padding: 10px; width: 15%;">삭제</th>
-                        <th style="border: 1px solid #000; background-color: #fef3c7; text-align: center; padding: 10px; width: 15%;">입력가능하도록</th>
+                        <th colspan="3" style="border: 1px solid #000; background-color: #fef3c7; text-align: center; padding: 10px;">유해위험요인</th>
+                        <th style="border: 1px solid #000; background-color: #fef3c7; text-align: center; padding: 10px; width: 20%;">비고</th>
                     </tr>
                 </table>
                 """, unsafe_allow_html=True)
@@ -1107,15 +1116,15 @@ with tab4:
                         st.markdown('<div class="hazard-table">', unsafe_allow_html=True)
                         
                         for row_idx, item_list in enumerate(items):
-                            cols = st.columns([0.5, 1.5, 5, 1.5, 1.5])
+                            cols = st.columns([0.5, 1.5, 2, 2, 2, 2])
                             
                             # 분류 번호 (카테고리당 한 번만)
                             with cols[0]:
                                 if row_idx == 0:
                                     st.markdown(f"""
                                     <div style="border: 1px solid #000; background-color: #fef3c7; 
-                                               text-align: center; padding: {15 * row_count}px 5px; 
-                                               font-weight: bold; height: {40 * row_count}px;
+                                               text-align: center; padding: {25 * row_count}px 5px; 
+                                               font-weight: bold; height: {50 * row_count}px;
                                                display: flex; align-items: center; justify-content: center;">
                                         {category_idx + 1}
                                     </div>
@@ -1126,46 +1135,34 @@ with tab4:
                                 if row_idx == 0:
                                     st.markdown(f"""
                                     <div style="border: 1px solid #000; background-color: #fef3c7; 
-                                               text-align: center; padding: {15 * row_count}px 5px; 
-                                               font-weight: bold; height: {40 * row_count}px;
+                                               text-align: center; padding: {25 * row_count}px 5px; 
+                                               font-weight: bold; height: {50 * row_count}px;
                                                display: flex; align-items: center; justify-content: center;">
                                         {category}
                                     </div>
                                     """, unsafe_allow_html=True)
                             
-                            # 유해위험요인 체크박스들
-                            with cols[2]:
-                                checkbox_cols = st.columns(3)
-                                for sub_idx, (item_text, is_checked) in enumerate(item_list):
-                                    if item_text:
-                                        with checkbox_cols[sub_idx]:
-                                            # 이미지에 표시된 것처럼 특정 항목만 체크
-                                            st.checkbox(
-                                                item_text, 
-                                                value=is_checked,
-                                                key=f"cb_{process_key}_{category_idx}_{row_idx}_{sub_idx}"
-                                            )
+                            # 유해위험요인 체크박스들 (3개 열에 분산)
+                            for sub_idx in range(3):
+                                with cols[2 + sub_idx]:
+                                    if sub_idx < len(item_list) and item_list[sub_idx][0]:
+                                        st.checkbox(
+                                            item_list[sub_idx][0], 
+                                            value=item_list[sub_idx][1],
+                                            key=f"cb_{process_key}_{category_idx}_{row_idx}_{sub_idx}"
+                                        )
+                                    else:
+                                        st.write("")
                             
-                            # 삭제 (첫 번째 행에만)
-                            with cols[3]:
-                                if row_idx == 0:
-                                    st.markdown(f"""
-                                    <div style="border: 1px solid #000; background-color: white; 
-                                               text-align: center; padding: {15 * row_count}px 5px; 
-                                               height: {40 * row_count}px;
-                                               display: flex; align-items: center; justify-content: center;">
-                                        삭제
-                                    </div>
-                                    """, unsafe_allow_html=True)
-                            
-                            # 입력가능하도록 (첫 번째 행에만)
-                            with cols[4]:
+                            # 비고 (입력 가능한 텍스트 영역) - 첫 번째 행에만
+                            with cols[5]:
                                 if row_idx == 0:
                                     st.text_area(
-                                        "입력",
+                                        "비고",
                                         height=40 * row_count - 10,
                                         label_visibility="collapsed",
-                                        key=f"input_{process_key}_{category_idx}"
+                                        key=f"remark_{process_key}_{category_idx}",
+                                        placeholder="비고 입력"
                                     )
                         
                         st.markdown('</div>', unsafe_allow_html=True)
