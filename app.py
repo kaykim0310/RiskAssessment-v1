@@ -416,6 +416,24 @@ with tab2:
                     height=100,
                     label_visibility="collapsed"
                 )
+    
+    # 데이터 저장 버튼
+    st.markdown('<br>', unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col2:
+        if st.button("💾 사업장 개요 데이터 저장", use_container_width=True, key="save_tab2"):
+            # 사업장 개요 데이터 수집
+            overview_data = {
+                'business_info': st.session_state.business_info,
+                'processes': st.session_state.processes
+            }
+            
+            # JSON으로 저장
+            json_str = json.dumps(overview_data, ensure_ascii=False, indent=2)
+            b64 = base64.b64encode(json_str.encode()).decode()
+            href = f'<a href="data:application/json;base64,{b64}" download="위험성평가_사업장개요_{datetime.now().strftime("%Y%m%d")}.json">다운로드 링크를 클릭하세요</a>'
+            st.markdown(href, unsafe_allow_html=True)
+            st.success("사업장 개요 데이터가 저장되었습니다!")
 
 with tab3:
     st.markdown('<h2 style="text-align: center; color: #1f2937;">안전보건상 위험정보</h2>', unsafe_allow_html=True)
@@ -444,16 +462,16 @@ with tab3:
     .process-header {
         background-color: #fef3c7;
         font-weight: bold;
-        font-size: 14px;
+        font-size: 16px;
     }
     .sub-header {
         background-color: #fef3c7;
-        font-size: 12px;
+        font-size: 14px;
         font-weight: normal;
     }
     .stTextInput input, .stTextArea textarea, .stSelectbox select {
-        font-size: 14px !important;
-        padding: 8px !important;
+        font-size: 16px !important;
+        padding: 10px !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -484,31 +502,29 @@ with tab3:
     # 공정(작업)순서 테이블
     st.markdown('<h3 style="text-align: center; color: #1f2937;">공정(작업)순서</h3>', unsafe_allow_html=True)
     
-    # 복잡한 테이블 헤더를 HTML로 구성
+    # 원본과 동일한 테이블 헤더
     st.markdown("""
     <table class="process-table">
         <tr>
-            <th rowspan="3" class="process-header" style="width: 10%;">공정<br>(작업)순서</th>
-            <th colspan="3" class="process-header">기계기구 및 설비명</th>
-            <th colspan="3" class="process-header">유해화학물질</th>
-            <th colspan="7" class="process-header">기타 안전보건상 정보</th>
+            <th rowspan="2" class="process-header" style="width: 10%;">공정<br>(작업)순서</th>
+            <th colspan="2" class="process-header">기계기구 및 설비명</th>
+            <th colspan="2" class="process-header">유해화학물질</th>
+            <th colspan="8" class="process-header">기타 안전보건상 정보</th>
         </tr>
         <tr>
-            <th rowspan="2" class="sub-header" style="width: 15%;">기계기구 및<br>설비명</th>
-            <th rowspan="2" class="sub-header" style="width: 5%;">수량</th>
-            <th rowspan="2" class="sub-header" style="width: 15%;">화학물질명</th>
-            <th rowspan="2" class="sub-header" style="width: 7%;">취급량/일</th>
-            <th rowspan="2" class="sub-header" style="width: 7%;">취급시간</th>
-            <th rowspan="2" class="sub-header" style="width: 7%;">3년간<br>재해사례</th>
-            <th rowspan="2" class="sub-header" style="width: 7%;">앗차<br>사고사례</th>
-            <th rowspan="2" class="sub-header" style="width: 7%;">근로자<br>구성및특성</th>
-            <th rowspan="2" class="sub-header" style="width: 7%;">도급/교대<br>작업유무</th>
-            <th rowspan="2" class="sub-header" style="width: 7%;">운반수단</th>
+            <th class="sub-header" style="width: 15%;">기계기구 및<br>설비명</th>
+            <th class="sub-header" style="width: 5%;">수량</th>
+            <th class="sub-header" style="width: 15%;">화학물질명</th>
+            <th class="sub-header" style="width: 7%;">취급량/일</th>
+            <th class="sub-header" style="width: 7%;">취급시간</th>
+            <th class="sub-header" style="width: 7%;">3년간<br>재해사례</th>
+            <th class="sub-header" style="width: 7%;">앗차<br>사고사례</th>
+            <th class="sub-header" style="width: 7%;">근로자<br>구성및특성</th>
+            <th class="sub-header" style="width: 7%;">도급/교대<br>작업유무</th>
+            <th class="sub-header" style="width: 7%;">운반수단</th>
             <th class="sub-header" style="width: 8%;">안전작업<br>허가증<br>필요작업</th>
             <th class="sub-header" style="width: 8%;">작업환경<br>측정유무</th>
-        </tr>
-        <tr>
-            <th colspan="2" class="sub-header">특별안전<br>교육대상</th>
+            <th class="sub-header" style="width: 10%;">특별안전<br>교육대상</th>
         </tr>
     </table>
     """, unsafe_allow_html=True)
@@ -517,8 +533,8 @@ with tab3:
     if 'processes' in st.session_state:
         for idx, process in enumerate(st.session_state.processes):
             if process['name']:
-                # 메인 데이터 행
-                cols = st.columns([1, 1.5, 0.5, 1.5, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.8, 0.8])
+                # 모든 컬럼을 한 줄에 배치
+                cols = st.columns([1, 1.5, 0.5, 1.5, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.8, 0.8, 1])
                 
                 # 공정(작업)순서
                 with cols[0]:
@@ -572,14 +588,43 @@ with tab3:
                 with cols[12]:
                     st.selectbox(f"측정_{idx}", ["", "유", "무"], label_visibility="collapsed")
                 
-                # 특별안전교육대상 (별도 행, 마지막 2개 컬럼 아래)
-                edu_cols = st.columns([8.3, 1.6])
-                with edu_cols[0]:
-                    st.markdown("")  # 빈 공간
-                with edu_cols[1]:
-                    st.text_input(f"특별교육_{idx}", placeholder="특별안전교육대상", label_visibility="collapsed", key=f"special_edu_{idx}")
+                # 특별안전교육대상
+                with cols[13]:
+                    st.text_input(f"특별교육_{idx}", placeholder="", label_visibility="collapsed")
                 
-                st.markdown('<hr style="margin: 10px 0; border: 0; border-top: 1px solid #e5e7eb;">', unsafe_allow_html=True)
+                st.markdown('<hr style="margin: 10px 0; border: 0; border-top: 1px solid #d97706;">', unsafe_allow_html=True)
+    
+    # 데이터 저장 버튼
+    st.markdown('<br>', unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col2:
+        if st.button("💾 위험정보 데이터 저장", use_container_width=True, key="save_tab3"):
+            # 위험정보 데이터 수집
+            risk_data = {
+                'industry_name': st.session_state.get('industry_name', ''),
+                'product_name': st.session_state.get('product_name', ''),
+                'raw_material': st.session_state.get('raw_material', ''),
+                'workers_info': st.session_state.get('workers_info', ''),
+                'processes': []
+            }
+            
+            # 프로세스별 데이터 수집
+            for idx, process in enumerate(st.session_state.processes):
+                if process['name']:
+                    process_data = {
+                        'name': process['name'],
+                        'equipment': process['equipment'],
+                        'hazardous_material': process['hazardous_material'],
+                        # 추가 입력 필드들도 수집 가능
+                    }
+                    risk_data['processes'].append(process_data)
+            
+            # JSON으로 저장
+            json_str = json.dumps(risk_data, ensure_ascii=False, indent=2)
+            b64 = base64.b64encode(json_str.encode()).decode()
+            href = f'<a href="data:application/json;base64,{b64}" download="위험성평가_위험정보_{datetime.now().strftime("%Y%m%d")}.json">다운로드 링크를 클릭하세요</a>'
+            st.markdown(href, unsafe_allow_html=True)
+            st.success("위험정보 데이터가 저장되었습니다!")
 
 # 사이드바에 도움말 추가
 with st.sidebar:
