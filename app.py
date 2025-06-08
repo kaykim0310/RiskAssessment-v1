@@ -226,29 +226,45 @@ with tab1:
             df = df.drop('approvers', axis=1)
             
             output = BytesIO()
-            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
                 df.to_excel(writer, sheet_name='표지', index=False)
                 
                 # 서식 설정
                 workbook = writer.book
                 worksheet = writer.sheets['표지']
                 
-                # 헤더 서식
-                header_format = workbook.add_format({
-                    'bg_color': '#fef3c7',
-                    'border': 1,
-                    'align': 'center',
-                    'valign': 'vcenter',
-                    'font_size': 12,
-                    'bold': True
-                })
+                # 헤더 스타일
+                from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
+                
+                header_fill = PatternFill(start_color='FEF3C7', end_color='FEF3C7', fill_type='solid')
+                header_font = Font(bold=True, size=12)
+                header_alignment = Alignment(horizontal='center', vertical='center')
+                thin_border = Border(
+                    left=Side(style='thin'),
+                    right=Side(style='thin'),
+                    top=Side(style='thin'),
+                    bottom=Side(style='thin')
+                )
                 
                 # 헤더 서식 적용
-                for col_num, value in enumerate(df.columns.values):
-                    worksheet.write(0, col_num, value, header_format)
+                for cell in worksheet[1]:
+                    cell.fill = header_fill
+                    cell.font = header_font
+                    cell.alignment = header_alignment
+                    cell.border = thin_border
                 
                 # 열 너비 조정
-                worksheet.set_column('A:Z', 20)
+                for column in worksheet.columns:
+                    max_length = 0
+                    column = [cell for cell in column]
+                    for cell in column:
+                        try:
+                            if len(str(cell.value)) > max_length:
+                                max_length = len(str(cell.value))
+                        except:
+                            pass
+                    adjusted_width = (max_length + 2) * 1.2
+                    worksheet.column_dimensions[column[0].column_letter].width = adjusted_width
             
             output.seek(0)
             b64 = base64.b64encode(output.read()).decode()
@@ -476,36 +492,47 @@ with tab2:
             
             # 엑셀로 저장
             output = BytesIO()
-            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
                 overview_df.to_excel(writer, sheet_name='사업장정보', index=False)
                 if not process_df.empty:
                     process_df.to_excel(writer, sheet_name='공정정보', index=False)
                 
                 # 서식 설정
-                workbook = writer.book
-                header_format = workbook.add_format({
-                    'bg_color': '#fef3c7',
-                    'border': 1,
-                    'align': 'center',
-                    'valign': 'vcenter',
-                    'font_size': 12,
-                    'bold': True
-                })
+                from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
+                
+                header_fill = PatternFill(start_color='FEF3C7', end_color='FEF3C7', fill_type='solid')
+                header_font = Font(bold=True, size=12)
+                header_alignment = Alignment(horizontal='center', vertical='center')
+                thin_border = Border(
+                    left=Side(style='thin'),
+                    right=Side(style='thin'),
+                    top=Side(style='thin'),
+                    bottom=Side(style='thin')
+                )
                 
                 # 각 시트에 서식 적용
                 for sheet_name in writer.sheets:
                     worksheet = writer.sheets[sheet_name]
-                    df = overview_df if sheet_name == '사업장정보' else process_df
                     
-                    for col_num, value in enumerate(df.columns.values):
-                        worksheet.write(0, col_num, value, header_format)
+                    # 헤더 서식
+                    for cell in worksheet[1]:
+                        cell.fill = header_fill
+                        cell.font = header_font
+                        cell.alignment = header_alignment
+                        cell.border = thin_border
                     
-                    # 열 너비 조정
-                    if sheet_name == '사업장정보':
-                        worksheet.set_column('A:F', 20)
-                    else:
-                        worksheet.set_column('A:A', 15)
-                        worksheet.set_column('B:E', 30)
+                    # 열 너비 자동 조정
+                    for column in worksheet.columns:
+                        max_length = 0
+                        column = [cell for cell in column]
+                        for cell in column:
+                            try:
+                                if len(str(cell.value)) > max_length:
+                                    max_length = len(str(cell.value))
+                            except:
+                                pass
+                        adjusted_width = (max_length + 2) * 1.2
+                        worksheet.column_dimensions[column[0].column_letter].width = adjusted_width
             
             output.seek(0)
             b64 = base64.b64encode(output.read()).decode()
@@ -708,7 +735,7 @@ with tab3:
             
             # 엑셀 파일 생성
             output = BytesIO()
-            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
                 # 헤더 정보
                 df_header = pd.DataFrame([header_data])
                 df_header.to_excel(writer, sheet_name='기본정보', index=False)
@@ -719,27 +746,41 @@ with tab3:
                     df_process.to_excel(writer, sheet_name='공정정보', index=False)
                 
                 # 서식 설정
-                workbook = writer.book
-                header_format = workbook.add_format({
-                    'bg_color': '#fef3c7',
-                    'border': 1,
-                    'align': 'center',
-                    'valign': 'vcenter',
-                    'font_size': 12,
-                    'bold': True
-                })
+                from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
                 
-                # 헤더 서식 적용
-                for worksheet in writer.sheets.values():
-                    for col_num, value in enumerate(df_process.columns.values if 'df_process' in locals() else []):
-                        worksheet.write(0, col_num, value, header_format)
+                header_fill = PatternFill(start_color='FEF3C7', end_color='FEF3C7', fill_type='solid')
+                header_font = Font(bold=True, size=12)
+                header_alignment = Alignment(horizontal='center', vertical='center')
+                thin_border = Border(
+                    left=Side(style='thin'),
+                    right=Side(style='thin'),
+                    top=Side(style='thin'),
+                    bottom=Side(style='thin')
+                )
+                
+                # 각 시트에 서식 적용
+                for sheet_name in writer.sheets:
+                    worksheet = writer.sheets[sheet_name]
+                    
+                    # 헤더 서식
+                    for cell in worksheet[1]:
+                        cell.fill = header_fill
+                        cell.font = header_font
+                        cell.alignment = header_alignment
+                        cell.border = thin_border
                     
                     # 열 너비 자동 조정
-                    worksheet.set_column(0, 0, 15)  # 공정순서
-                    worksheet.set_column(1, 1, 30)  # 기계기구
-                    worksheet.set_column(2, 2, 10)  # 수량
-                    worksheet.set_column(3, 3, 30)  # 화학물질
-                    worksheet.set_column(4, 13, 15)  # 나머지 열들
+                    for column in worksheet.columns:
+                        max_length = 0
+                        column = [cell for cell in column]
+                        for cell in column:
+                            try:
+                                if len(str(cell.value)) > max_length:
+                                    max_length = len(str(cell.value))
+                            except:
+                                pass
+                        adjusted_width = (max_length + 2) * 1.2
+                        worksheet.column_dimensions[column[0].column_letter].width = adjusted_width
             
             # 다운로드 링크 생성
             output.seek(0)
