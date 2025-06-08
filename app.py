@@ -372,7 +372,7 @@ with tab2:
                 value=st.session_state.processes[i]['equipment'],
                 placeholder="주요기계기구",
                 key=f"process_equip_{i}",
-                height=60,
+                height=80,
                 label_visibility="collapsed"
             )
             
@@ -382,7 +382,7 @@ with tab2:
                 value=st.session_state.processes[i]['hazardous_material'],
                 placeholder="유해위험물질",
                 key=f"process_material_{i}",
-                height=60,
+                height=80,
                 label_visibility="collapsed"
             )
             
@@ -392,7 +392,7 @@ with tab2:
                 value=st.session_state.processes[i]['hazardous_factor'],
                 placeholder="유해위험요인",
                 key=f"process_factor_{i}",
-                height=60,
+                height=80,
                 label_visibility="collapsed"
             )
     
