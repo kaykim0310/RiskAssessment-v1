@@ -911,19 +911,30 @@ with tab4:
                 </style>
                 """, unsafe_allow_html=True)
                 
+                # 공정 제목 (위의 공정과 동일한 스타일)
+                st.markdown(f"""
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                    <tr>
+                        <td colspan="4" style="text-align: center; font-size: 18px; font-weight: bold; padding: 15px; background-color: white;">
+                            공정: {chr(65 + idx)}
+                        </td>
+                    </tr>
+                </table>
+                """, unsafe_allow_html=True)
+                
                 # 테이블 헤더
                 st.markdown(f"""
                 <table class="hazard-table">
                     <tr>
-                        <th rowspan="2">제조 공정</th>
-                        <th colspan="3">유해위험요인 분류</th>
-                        <th rowspan="2">세부 공정</th>
-                        <th rowspan="2">분류 코드</th>
+                        <th rowspan="2" style="width: 10%;">제조 공정</th>
+                        <th colspan="3" style="width: 70%;">유해위험요인 분류</th>
+                        <th rowspan="2" style="width: 10%;">세부 공정</th>
+                        <th rowspan="2" style="width: 10%;">분류 코드</th>
                     </tr>
                     <tr>
-                        <th>분류</th>
-                        <th>분야</th>
-                        <th>유해 위험 요인</th>
+                        <th style="width: 15%;">분류</th>
+                        <th style="width: 35%;">분야</th>
+                        <th style="width: 20%;">유해 위험 요인</th>
                     </tr>
                 </table>
                 """, unsafe_allow_html=True)
@@ -940,14 +951,20 @@ with tab4:
                         # 분류 번호 (각 카테고리의 첫 번째 행에만 표시)
                         with cols[0]:
                             if row_idx == 0:
-                                st.text_input("분류번호", value=f"{category_idx+1}", disabled=True, 
-                                            label_visibility="collapsed", key=f"catnum_{process_key}_{category_idx}_{row_idx}")
+                                st.text_area(f"분류번호_{process_key}_{category_idx}_{row_idx}", 
+                                           value=f"{category_idx+1}", 
+                                           disabled=True, 
+                                           label_visibility="collapsed",
+                                           height=50)
                         
                         # 분류명 (각 카테고리의 첫 번째 행에만 표시)
                         with cols[1]:
                             if row_idx == 0:
-                                st.text_input("분류명", value=category, disabled=True, 
-                                            label_visibility="collapsed", key=f"catname_{process_key}_{category_idx}_{row_idx}")
+                                st.text_area(f"분류명_{process_key}_{category_idx}_{row_idx}", 
+                                           value=category, 
+                                           disabled=True, 
+                                           label_visibility="collapsed",
+                                           height=50)
                         
                         # 3개의 체크박스와 유해위험요인 항목
                         for item_idx, item in enumerate(row_items):
@@ -966,8 +983,8 @@ with tab4:
                         
                         # 유해 위험 요인 입력란
                         with cols[5]:
-                            hazard_input = st.text_area("유해위험요인", label_visibility="collapsed", 
-                                                      key=f"hazard_text_{process_key}_{category_idx}_{row_idx}", 
+                            hazard_input = st.text_area(f"유해위험요인_{process_key}_{category_idx}_{row_idx}", 
+                                                      label_visibility="collapsed",
                                                       height=50)
                             if hazard_input:
                                 for item_idx in range(len(row_items)):
@@ -978,14 +995,20 @@ with tab4:
                         # 세부 공정 (첫 번째 카테고리의 첫 번째 행에만 표시)
                         with cols[6]:
                             if category_idx == 0 and row_idx == 0:
-                                st.text_input("세부공정", value=process['name'], disabled=True, 
-                                            label_visibility="collapsed", key=f"subprocess_{process_key}")
+                                st.text_area(f"세부공정_{process_key}", 
+                                           value=process['name'], 
+                                           disabled=True, 
+                                           label_visibility="collapsed",
+                                           height=50)
                         
                         # 분류 코드 (첫 번째 카테고리의 첫 번째 행에만 표시)
                         with cols[7]:
                             if category_idx == 0 and row_idx == 0:
-                                st.text_input("분류코드", value=f"공정: {chr(65 + idx)}", disabled=True, 
-                                            label_visibility="collapsed", key=f"classcode_{process_key}")
+                                st.text_area(f"분류코드_{process_key}", 
+                                           value=f"공정: {chr(65 + idx)}", 
+                                           disabled=True, 
+                                           label_visibility="collapsed",
+                                           height=50)
                         
                         st.markdown('<hr style="margin: 5px 0; border: 0; border-top: 1px solid #e5e7eb;">', unsafe_allow_html=True)
                 
