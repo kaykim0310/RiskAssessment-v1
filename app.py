@@ -1,9 +1,4 @@
-# 테이블 헤더와 첫 번째 데이터 행 결합
-                # 제조공정 컬럼
-                cols = st.columns([0.5, 0.5, 1.2, 2.5, 2.5, 0.8, 0.8])
-                
-                with cols[0]:
-                    st.markdown('<div style="border: 1px solid #1f2937; background-color: #fimport streamlit as st
+import streamlit as st
 import json
 from datetime import datetime
 import pandas as pd
@@ -1026,43 +1021,6 @@ with tab4:
                 if process_key not in st.session_state.hazard_classifications:
                     st.session_state.hazard_classifications[process_key] = {}
                 
-                # 테이블 스타일
-                st.markdown("""
-                <style>
-                .hazard-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-top: 20px;
-                    margin-bottom: 30px;
-                }
-                .hazard-table th, .hazard-table td {
-                    border: 1px solid #1f2937;
-                    padding: 8px;
-                    text-align: left;
-                    vertical-align: top;
-                }
-                .hazard-table th {
-                    background-color: #fef3c7;
-                    font-weight: bold;
-                    text-align: center;
-                }
-                .hazard-category {
-                    background-color: #fef3c7;
-                    font-weight: bold;
-                    text-align: center;
-                    width: 15%;
-                }
-                .hazard-detail {
-                    width: 35%;
-                }
-                .hazard-process {
-                    text-align: center;
-                    font-weight: bold;
-                    width: 15%;
-                }
-                </style>
-                """, unsafe_allow_html=True)
-                
                 # 테이블 헤더와 입력 필드
                 st.markdown(f"""
                 <table style="width: 100%; border-collapse: collapse;">
@@ -1277,9 +1235,9 @@ with tab4:
                                 item_text = ""
                                 for item_idx, item in enumerate(row_items):
                                     if item and item[0]:
-                                        key = f"{process_key}_{category_idx}_{row_idx}_{item_idx}"
-                                        if key in st.session_state.hazard_classifications.get(process_key, {}):
-                                            if st.session_state.hazard_classifications[process_key][key].get('checked'):
+                                        key = f"cb_{process_key}_{category_idx}_{row_idx}_{item_idx}"
+                                        if key in st.session_state:
+                                            if st.session_state[key]:
                                                 item_text += f"■ {item[0]}   "
                                             else:
                                                 item_text += f"□ {item[0]}   "
@@ -1291,15 +1249,7 @@ with tab4:
                                 worksheet[f'C{current_row}'].border = thin_border
                                 
                                 # 유해위험요인
-                                hazard_text = ""
-                                for item_idx in range(len(row_items)):
-                                    key = f"{process_key}_{category_idx}_{row_idx}_{item_idx}"
-                                    if key in st.session_state.hazard_classifications.get(process_key, {}):
-                                        if 'hazard' in st.session_state.hazard_classifications[process_key][key]:
-                                            hazard_text = st.session_state.hazard_classifications[process_key][key]['hazard']
-                                            break
-                                
-                                worksheet[f'E{current_row}'].value = hazard_text
+                                worksheet[f'E{current_row}'].value = ""
                                 worksheet[f'E{current_row}'].alignment = left_align
                                 worksheet[f'E{current_row}'].border = thin_border
                                 
