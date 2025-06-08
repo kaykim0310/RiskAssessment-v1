@@ -213,13 +213,13 @@ with tab1:
     col1, col2, col3 = st.columns([1, 1, 1])
     
     with col2:
-        if st.button("💾 데이터 저장", use_container_width=True):
+        if st.button("💾 표지 데이터 저장", use_container_width=True):
             # JSON으로 저장
             json_str = json.dumps(st.session_state.form_data, ensure_ascii=False, indent=2)
             b64 = base64.b64encode(json_str.encode()).decode()
             href = f'<a href="data:application/json;base64,{b64}" download="위험성평가_표지_{st.session_state.form_data.get("year", "YYYY")}.json">다운로드 링크를 클릭하세요</a>'
             st.markdown(href, unsafe_allow_html=True)
-            st.success("데이터가 저장되었습니다!")
+            st.success("표지 데이터가 저장되었습니다!")
 
 with tab2:
     st.markdown('<h2 style="text-align: center; color: #1f2937;">1. 사업장 개요</h2>', unsafe_allow_html=True)
