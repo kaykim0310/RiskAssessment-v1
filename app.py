@@ -1062,29 +1062,46 @@ with tab4:
                         'classification_code': ''
                     }
                 
-                # 테이블 구조 생성 - 헤더만 표시
+                # 상단 테이블 생성
                 st.markdown(f"""
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
+                <style>
+                    .hazard-header {{
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 0px;
+                    }}
+                    .hazard-header td {{
+                        border: 1px solid #000;
+                        padding: 10px;
+                        text-align: center;
+                    }}
+                    .header-cell {{
+                        background-color: #fef3c7;
+                        font-weight: bold;
+                    }}
+                    .input-cell {{
+                        background-color: white;
+                        height: 40px;
+                    }}
+                </style>
+                
+                <table class="hazard-header">
                     <tr>
-                        <td colspan="2" style="border: 1px solid #000; background-color: #fef3c7; text-align: center; font-weight: bold; padding: 10px;">
-                            제조 공정
-                        </td>
-                        <td colspan="2" style="border: 1px solid #000; background-color: #fef3c7; text-align: center; font-weight: bold; font-size: 18px; padding: 10px;">
-                            유해위험요인 분류
-                        </td>
-                        <td style="border: 1px solid #000; background-color: #fef3c7; text-align: center; font-weight: bold; padding: 10px;">
-                            세부 공정
-                        </td>
-                        <td style="border: 1px solid #000; background-color: #fef3c7; text-align: center; font-weight: bold; padding: 10px;">
-                            분류 코드
-                        </td>
+                        <td rowspan="2" class="header-cell" style="width: 10%;">제조 공정</td>
+                        <td colspan="2" class="header-cell" style="width: 40%; font-size: 18px;">유해위험요인 분류</td>
+                        <td rowspan="2" class="header-cell" style="width: 25%;">세부 공정</td>
+                        <td rowspan="2" class="header-cell" style="width: 25%;">분류 코드</td>
+                    </tr>
+                    <tr>
+                        <td class="input-cell" colspan="2"></td>
                     </tr>
                 </table>
                 """, unsafe_allow_html=True)
                 
-                # 입력 필드 행
-                cols = st.columns([2, 2, 1, 1])
-                with cols[0]:
+                # 입력 필드를 테이블 위에 오버레이
+                col1, col2, col3 = st.columns([1, 2.5, 1.5])
+                
+                with col1:
                     mfg_process = st.text_input(
                         "제조공정", 
                         value=st.session_state.hazard_classifications[process_key]['manufacturing_process'],
@@ -1093,21 +1110,19 @@ with tab4:
                     )
                     st.session_state.hazard_classifications[process_key]['manufacturing_process'] = mfg_process
                 
-                with cols[1]:
-                    # 유해위험요인 분류는 제목이므로 빈 공간
-                    st.write("")
+                with col2:
+                    subcol1, subcol2 = st.columns([1, 1])
+                    with subcol2:
+                        # 세부공정 - 탭2의 공정명 자동입력
+                        st.text_input(
+                            "세부공정", 
+                            value=process['name'], 
+                            disabled=True, 
+                            label_visibility="collapsed", 
+                            key=f"subprocess_{process_key}"
+                        )
                 
-                with cols[2]:
-                    # 세부공정 - 탭2의 공정명 자동입력
-                    st.text_input(
-                        "세부공정", 
-                        value=process['name'], 
-                        disabled=True, 
-                        label_visibility="collapsed", 
-                        key=f"subprocess_{process_key}"
-                    )
-                
-                with cols[3]:
+                with col3:
                     class_code = st.text_input(
                         "분류코드", 
                         value=st.session_state.hazard_classifications[process_key]['classification_code'],
