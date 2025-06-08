@@ -115,7 +115,7 @@ st.markdown('<h1 style="text-align: center; color: #1f2937;">위험성평가 작
 st.markdown('---')
 
 # 탭 생성
-tab1, tab2, tab3 = st.tabs(["📄 표지", "📊 사업장 개요", "📋 평가서"])
+tab1, tab2, tab3 = st.tabs(["📄 표지", "📊 사업장 개요", "⚠️ 위험정보"])
 
 with tab1:
     st.markdown('<div class="cover-container">', unsafe_allow_html=True)
