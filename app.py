@@ -1,16 +1,4 @@
-# 우측에 입력 가능한 텍스트 영역 추가
-                col_table, col_input = st.columns([4, 1])
-                
-                with col_input:
-                    st.text_area(
-                        "추가 입력",
-                        height=300,
-                        label_visibility="collapsed",
-                        key=f"additional_notes_{process_key}",
-                        placeholder="입력가능하도록"
-                    )
-                
-                with col_table:                st.markdown('<hr style="margin: 30px 0; border: 2px solid #000;">', unsafe_allow_html=True)import streamlit as st
+import streamlit as st
 import json
 from datetime import datetime
 import pandas as pd
@@ -111,19 +99,21 @@ st.markdown("""
     }
     
     .hazard-table .stCheckbox {
-        margin-bottom: -10px !important;
+        margin-bottom: -15px !important;
         padding: 0px !important;
     }
     
     .hazard-table label {
         margin-bottom: 0 !important;
-        font-size: 13px !important;
-        padding: 2px 0 !important;
+        font-size: 12px !important;
+        padding: 0px !important;
+        line-height: 1.2 !important;
     }
     
     /* 체크박스 간격 조정 */
     .stCheckbox > div {
-        margin-bottom: -5px !important;
+        margin-bottom: -10px !important;
+        padding: 0 !important;
     }
     
     .stCheckbox > label > div {
@@ -133,6 +123,11 @@ st.markdown("""
     /* 체크박스 컨테이너 간격 제거 */
     [data-testid="stVerticalBlock"] > div:has(.stCheckbox) {
         gap: 0 !important;
+    }
+    
+    /* 체크박스 자체 크기 조정 */
+    .stCheckbox input[type="checkbox"] {
+        margin-right: 5px !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -1103,62 +1098,252 @@ with tab4:
                 with cols_top[4]:
                     st.text_input("", label_visibility="collapsed", key=f"classcode_input_{process_key}")
                 
-                    # 유해위험요인 분류 테이블
-                    st.markdown("""
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-                        <tr>
-                            <th style="border: 1px solid #000; background-color: #fef3c7; text-align: center; padding: 10px; width: 5%;">분류</th>
-                            <th style="border: 1px solid #000; background-color: #fef3c7; text-align: center; padding: 10px; width: 15%;">분야</th>
-                            <th colspan="3" style="border: 1px solid #000; background-color: #fef3c7; text-align: center; padding: 10px;">유해위험요인</th>
-                        </tr>
-                    </table>
-                    """, unsafe_allow_html=True)
+                # 유해위험요인 분류 테이블
+                st.markdown("""
+                <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                    <tr>
+                        <th style="border: 1px solid #000; background-color: #fef3c7; text-align: center; padding: 10px; width: 5%;">분류</th>
+                        <th style="border: 1px solid #000; background-color: #fef3c7; text-align: center; padding: 10px; width: 15%;">분야</th>
+                        <th colspan="3" style="border: 1px solid #000; background-color: #fef3c7; text-align: center; padding: 10px;">유해위험요인</th>
+                        <th style="border: 1px solid #000; background-color: #fef3c7; text-align: center; padding: 10px; width: 20%;">입력가능하도록</th>
+                    </tr>
+                </table>
+                """, unsafe_allow_html=True)
                 
-                    # 각 카테고리별로 행 생성
-                    for category_idx, (category, items) in enumerate(hazard_categories.items()):
-                        row_count = len(items)
+                # 각 카테고리별로 행 생성
+                for category_idx, (category, items) in enumerate(hazard_categories.items()):
+                    row_count = len(items)
+                    
+                    # 카테고리별 컨테이너
+                    with st.container():
+                        st.markdown('<div class="hazard-table">', unsafe_allow_html=True)
                         
-                        # 카테고리별 컨테이너
-                        with st.container():
-                            st.markdown('<div class="hazard-table">', unsafe_allow_html=True)
+                        for row_idx, item_list in enumerate(items):
+                            cols = st.columns([0.5, 1.5, 2, 2, 2, 2])
                             
-                            for row_idx, item_list in enumerate(items):
-                                cols = st.columns([0.5, 1.5, 2.5, 2.5, 2.5])
-                                
-                                # 분류 번호 (카테고리당 한 번만)
-                                with cols[0]:
-                                    if row_idx == 0:
-                                        st.markdown(f"""
-                                        <div style="border: 1px solid #000; background-color: #fef3c7; 
-                                                   text-align: center; padding: {25 * row_count}px 5px; 
-                                                   font-weight: bold; height: {50 * row_count}px;
-                                                   display: flex; align-items: center; justify-content: center;">
-                                            {category_idx + 1}
-                                        </div>
-                                        """, unsafe_allow_html=True)
-                                
-                                # 분야 (카테고리당 한 번만)
-                                with cols[1]:
-                                    if row_idx == 0:
-                                        st.markdown(f"""
-                                        <div style="border: 1px solid #000; background-color: #fef3c7; 
-                                                   text-align: center; padding: {25 * row_count}px 5px; 
-                                                   font-weight: bold; height: {50 * row_count}px;
-                                                   display: flex; align-items: center; justify-content: center;">
-                                            {category}
-                                        </div>
-                                        """, unsafe_allow_html=True)
-                                
-                                # 유해위험요인 체크박스들 (3개 열에 분산)
-                                for sub_idx in range(3):
-                                    with cols[2 + sub_idx]:
-                                        if sub_idx < len(item_list) and item_list[sub_idx][0]:
-                                            st.checkbox(
-                                                item_list[sub_idx][0], 
-                                                value=item_list[sub_idx][1],
-                                                key=f"cb_{process_key}_{category_idx}_{row_idx}_{sub_idx}"
-                                            )
+                            # 분류 번호 (카테고리당 한 번만)
+                            with cols[0]:
+                                if row_idx == 0:
+                                    st.markdown(f"""
+                                    <div style="border: 1px solid #000; background-color: #fef3c7; 
+                                               text-align: center; padding: {25 * row_count}px 5px; 
+                                               font-weight: bold; height: {50 * row_count}px;
+                                               display: flex; align-items: center; justify-content: center;">
+                                        {category_idx + 1}
+                                    </div>
+                                    """, unsafe_allow_html=True)
+                            
+                            # 분야 (카테고리당 한 번만)
+                            with cols[1]:
+                                if row_idx == 0:
+                                    st.markdown(f"""
+                                    <div style="border: 1px solid #000; background-color: #fef3c7; 
+                                               text-align: center; padding: {25 * row_count}px 5px; 
+                                               font-weight: bold; height: {50 * row_count}px;
+                                               display: flex; align-items: center; justify-content: center;">
+                                        {category}
+                                    </div>
+                                    """, unsafe_allow_html=True)
+                            
+                            # 유해위험요인 체크박스들 (3개 열에 분산)
+                            for sub_idx in range(3):
+                                with cols[2 + sub_idx]:
+                                    if sub_idx < len(item_list) and item_list[sub_idx][0]:
+                                        st.checkbox(
+                                            item_list[sub_idx][0], 
+                                            value=item_list[sub_idx][1],
+                                            key=f"cb_{process_key}_{category_idx}_{row_idx}_{sub_idx}"
+                                        )
+                                    else:
+                                        st.write("")
+                            
+                            # 입력가능하도록 (첫 번째 행에만)
+                            with cols[5]:
+                                if row_idx == 0:
+                                    st.text_area(
+                                        "입력",
+                                        height=40 * row_count - 10,
+                                        label_visibility="collapsed",
+                                        key=f"input_{process_key}_{category_idx}",
+                                        placeholder="메모 입력"
+                                    )
+                        
+                        st.markdown('</div>', unsafe_allow_html=True)
+                
+                st.markdown('<hr style="margin: 30px 0; border: 2px solid #000;">', unsafe_allow_html=True)
+    
+    # 데이터 저장 버튼
+    st.markdown('<br>', unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col2:
+        if st.button("💾 유해위험요인 엑셀 저장", use_container_width=True, key="save_tab4"):
+            output = BytesIO()
+            
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                # 빈 데이터프레임으로 시트 생성
+                df = pd.DataFrame()
+                df.to_excel(writer, sheet_name='유해위험요인분류', index=False)
+                
+                workbook = writer.book
+                worksheet = writer.sheets['유해위험요인분류']
+                
+                # 서식 설정
+                from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
+                from openpyxl.utils import get_column_letter
+                
+                header_fill = PatternFill(start_color='FEF3C7', end_color='FEF3C7', fill_type='solid')
+                thin_border = Border(
+                    left=Side(style='thin'),
+                    right=Side(style='thin'),
+                    top=Side(style='thin'),
+                    bottom=Side(style='thin')
+                )
+                center_align = Alignment(horizontal='center', vertical='center', wrap_text=True)
+                left_align = Alignment(horizontal='left', vertical='center', wrap_text=True)
+                
+                current_row = 1
+                
+                # 각 공정별로 테이블 생성
+                for process_idx, process in enumerate(st.session_state.processes):
+                    if process['name']:
+                        # 첫 번째 행 - 헤더
+                        worksheet['A' + str(current_row)].value = "제조 공정"
+                        worksheet['A' + str(current_row)].fill = header_fill
+                        worksheet['A' + str(current_row)].alignment = center_align
+                        worksheet['A' + str(current_row)].border = thin_border
+                        
+                        worksheet['B' + str(current_row)].value = st.session_state.get(f"mfg_input_hazard_{process_idx}", "")
+                        worksheet['B' + str(current_row)].alignment = center_align
+                        worksheet['B' + str(current_row)].border = thin_border
+                        
+                        worksheet.merge_cells(f'C{current_row}:D{current_row}')
+                        worksheet['C' + str(current_row)].value = "유해위험요인 분류"
+                        worksheet['C' + str(current_row)].fill = header_fill
+                        worksheet['C' + str(current_row)].alignment = center_align
+                        worksheet['C' + str(current_row)].border = thin_border
+                        
+                        worksheet['E' + str(current_row)].value = "세부 공정"
+                        worksheet['E' + str(current_row)].fill = header_fill
+                        worksheet['E' + str(current_row)].alignment = center_align
+                        worksheet['E' + str(current_row)].border = thin_border
+                        
+                        worksheet['F' + str(current_row)].value = process['name']
+                        worksheet['F' + str(current_row)].alignment = center_align
+                        worksheet['F' + str(current_row)].border = thin_border
+                        
+                        # 두 번째 행
+                        current_row += 1
+                        worksheet['E' + str(current_row)].value = "분류 코드"
+                        worksheet['E' + str(current_row)].fill = header_fill
+                        worksheet['E' + str(current_row)].alignment = center_align
+                        worksheet['E' + str(current_row)].border = thin_border
+                        
+                        worksheet['F' + str(current_row)].value = st.session_state.get(f"classcode_input_hazard_{process_idx}", "")
+                        worksheet['F' + str(current_row)].alignment = center_align
+                        worksheet['F' + str(current_row)].border = thin_border
+                        
+                        # 세 번째 행 - 테이블 헤더
+                        current_row += 2
+                        worksheet['A' + str(current_row)].value = "분류"
+                        worksheet['A' + str(current_row)].fill = header_fill
+                        worksheet['A' + str(current_row)].alignment = center_align
+                        worksheet['A' + str(current_row)].border = thin_border
+                        
+                        worksheet['B' + str(current_row)].value = "분야"
+                        worksheet['B' + str(current_row)].fill = header_fill
+                        worksheet['B' + str(current_row)].alignment = center_align
+                        worksheet['B' + str(current_row)].border = thin_border
+                        
+                        worksheet.merge_cells(f'C{current_row}:D{current_row}')
+                        worksheet['C' + str(current_row)].value = "유해위험요인"
+                        worksheet['C' + str(current_row)].fill = header_fill
+                        worksheet['C' + str(current_row)].alignment = center_align
+                        worksheet['C' + str(current_row)].border = thin_border
+                        
+                        worksheet['E' + str(current_row)].value = "비고"
+                        worksheet['E' + str(current_row)].fill = header_fill
+                        worksheet['E' + str(current_row)].alignment = center_align
+                        worksheet['E' + str(current_row)].border = thin_border
+                        
+                        # 데이터 행
+                        current_row += 1
+                        process_key = f"hazard_{process_idx}"
+                        
+                        for category_idx, (category, items) in enumerate(hazard_categories.items()):
+                            category_start_row = current_row
+                            
+                            # 각 카테고리의 모든 항목
+                            all_items = []
+                            for row_items in items:
+                                for item, _ in row_items:
+                                    if item:
+                                        all_items.append(item)
+                            
+                            # 카테고리 정보 입력
+                            worksheet['A' + str(current_row)].value = str(category_idx + 1)
+                            worksheet['A' + str(current_row)].alignment = center_align
+                            worksheet['A' + str(current_row)].border = thin_border
+                            
+                            worksheet['B' + str(current_row)].value = category
+                            worksheet['B' + str(current_row)].alignment = center_align
+                            worksheet['B' + str(current_row)].border = thin_border
+                            
+                            # 체크된 항목들 수집
+                            checked_items = []
+                            for row_idx, row_items in enumerate(items):
+                                for sub_idx, (item_text, _) in enumerate(row_items):
+                                    if item_text:
+                                        key = f"cb_{process_key}_{category_idx}_{row_idx}_{sub_idx}"
+                                        if key in st.session_state and st.session_state[key]:
+                                            checked_items.append(f"■ {item_text}")
                                         else:
-                                            st.write("")
+                                            checked_items.append(f"□ {item_text}")
                             
-                            st.markdown('</div>', unsafe_allow_html=True)
+                            # 유해위험요인 내용
+                            worksheet.merge_cells(f'C{current_row}:D{current_row}')
+                            worksheet['C' + str(current_row)].value = "  ".join(checked_items)
+                            worksheet['C' + str(current_row)].alignment = left_align
+                            worksheet['C' + str(current_row)].border = thin_border
+                            
+                            # 비고 (입력 내용)
+                            input_key = f"input_{process_key}_{category_idx}"
+                            worksheet['E' + str(current_row)].value = st.session_state.get(input_key, "")
+                            worksheet['E' + str(current_row)].alignment = left_align
+                            worksheet['E' + str(current_row)].border = thin_border
+                            
+                            current_row += 1
+                        
+                        current_row += 2  # 공정 간 간격
+                
+                # 열 너비 조정
+                worksheet.column_dimensions['A'].width = 8
+                worksheet.column_dimensions['B'].width = 20
+                worksheet.column_dimensions['C'].width = 40
+                worksheet.column_dimensions['D'].width = 40
+                worksheet.column_dimensions['E'].width = 30
+                worksheet.column_dimensions['F'].width = 15
+            
+            output.seek(0)
+            b64 = base64.b64encode(output.read()).decode()
+            href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="위험성평가_유해위험요인_{datetime.now().strftime("%Y%m%d")}.xlsx">📥 엑셀 파일 다운로드</a>'
+            st.markdown(href, unsafe_allow_html=True)
+            st.success("유해위험요인 분류표가 엑셀 파일로 저장되었습니다!")
+
+# 사이드바에 도움말 추가
+with st.sidebar:
+    st.markdown("### 📌 사용 방법")
+    st.markdown("""
+    1. **표지 탭**에서 기본 정보를 입력하세요
+    2. **사업장 개요 탭**에서 공정 정보를 입력하세요
+    3. **위험정보 탭**에서 위험성평가를 수행하세요
+    4. **유해위험요인 탭**에서 위험요인을 분류하세요
+    5. 완료 후 전체 보고서를 생성할 수 있습니다
+    """)
+    
+    st.markdown("### 🔧 기능")
+    st.markdown("""
+    - ✅ 데이터 자동 저장
+    - ✅ PDF 보고서 생성
+    - ✅ Excel 내보내기
+    - ✅ 이전 평가 불러오기
+    """)
