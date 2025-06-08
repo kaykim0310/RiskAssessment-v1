@@ -1068,7 +1068,7 @@ with tab4:
                         <td rowspan="2" style="border: 1px solid #1f2937; background-color: white; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 10%;">
                             &nbsp;
                         </td>
-                        <td colspan="4" style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 20px; font-weight: bold; padding: 15px;">
+                        <td rowspan="2" colspan="4" style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 24px; font-weight: bold; padding: 15px;">
                             유해위험요인 분류
                         </td>
                         <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 10%;">
@@ -1079,12 +1079,6 @@ with tab4:
                         </td>
                     </tr>
                     <tr>
-                        <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 14px; font-weight: bold; padding: 10px; width: 15%;">
-                            분류
-                        </td>
-                        <td colspan="3" style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 14px; font-weight: bold; padding: 10px;">
-                            &nbsp;
-                        </td>
                         <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 10%;">
                             분류 코드
                         </td>
@@ -1107,26 +1101,23 @@ with tab4:
                         # 분류 번호 (각 카테고리의 첫 번째 행에만 표시)
                         with cols[0]:
                             if row_idx == 0:
-                                st.text_area(f"분류번호_{process_key}_{category_idx}_{row_idx}", 
+                                st.text_input(f"분류번호_{process_key}_{category_idx}_{row_idx}", 
                                            value=f"{category_idx+1}", 
                                            disabled=True, 
-                                           label_visibility="collapsed",
-                                           height=50)
+                                           label_visibility="collapsed")
                         
                         # 입력공간 (첫 번째) - 빈 입력칸
                         with cols[1]:
-                            st.text_area(f"입력공간1_{process_key}_{category_idx}_{row_idx}", 
-                                       label_visibility="collapsed",
-                                       height=50)
+                            st.text_input(f"입력공간1_{process_key}_{category_idx}_{row_idx}", 
+                                       label_visibility="collapsed")
                         
                         # 분류명 (각 카테고리의 첫 번째 행에만 표시)
                         with cols[2]:
                             if row_idx == 0:
-                                st.text_area(f"분류명_{process_key}_{category_idx}_{row_idx}", 
+                                st.text_input(f"분류명_{process_key}_{category_idx}_{row_idx}", 
                                            value=category, 
                                            disabled=True, 
-                                           label_visibility="collapsed",
-                                           height=50)
+                                           label_visibility="collapsed")
                         
                         # 3개의 체크박스와 유해위험요인 항목
                         for item_idx, item in enumerate(row_items):
@@ -1145,9 +1136,8 @@ with tab4:
                         
                         # 유해 위험 요인 입력란
                         with cols[6]:
-                            hazard_input = st.text_area(f"유해위험요인_{process_key}_{category_idx}_{row_idx}", 
-                                                      label_visibility="collapsed",
-                                                      height=50)
+                            hazard_input = st.text_input(f"유해위험요인_{process_key}_{category_idx}_{row_idx}", 
+                                                      label_visibility="collapsed")
                             if hazard_input:
                                 for item_idx in range(len(row_items)):
                                     key = f"{process_key}_{category_idx}_{row_idx}_{item_idx}"
