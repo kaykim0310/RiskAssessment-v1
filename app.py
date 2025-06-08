@@ -485,26 +485,25 @@ with tab3:
     <table class="process-table">
         <tr>
             <th rowspan="3" class="process-header">공정<br>(작업)순서</th>
-            <th rowspan="2" colspan="2" class="process-header">기계기구 및 설비명</th>
-            <th rowspan="2" colspan="2" class="process-header">유해화학물질</th>
+            <th colspan="3" class="process-header">기계기구 및 설비명</th>
+            <th colspan="3" class="process-header">유해화학물질</th>
             <th colspan="8" class="process-header">기타 안전보건상 정보</th>
         </tr>
         <tr>
+            <th rowspan="2" class="sub-header">기계기구 및<br>설비명</th>
             <th rowspan="2" class="sub-header">수량</th>
             <th rowspan="2" class="sub-header">화학물질명</th>
             <th rowspan="2" class="sub-header">취급량/일</th>
+            <th rowspan="2" class="sub-header">취급시간</th>
+            <th rowspan="2" class="sub-header">3년간<br>재해사례</th>
             <th rowspan="2" class="sub-header">앗차<br>사고사례</th>
             <th rowspan="2" class="sub-header">근로자<br>구성및특성</th>
             <th rowspan="2" class="sub-header">도급/교대<br>작업유무</th>
             <th rowspan="2" class="sub-header">운반수단</th>
-            <th colspan="2" class="sub-header">안전작업<br>허가증유무</th>
-            <th colspan="2" class="sub-header">작업환경<br>측정유무</th>
+            <th class="sub-header">안전작업<br>허가증유무</th>
+            <th class="sub-header">작업환경<br>측정유무</th>
         </tr>
         <tr>
-            <th class="sub-header">기계기구 및<br>설비명</th>
-            <th class="sub-header">수량</th>
-            <th class="sub-header">화학물질명</th>
-            <th class="sub-header">취급량/일</th>
             <th colspan="2" class="sub-header">특별안전<br>교육대상</th>
         </tr>
     </table>
@@ -514,57 +513,63 @@ with tab3:
     if 'processes' in st.session_state:
         for idx, process in enumerate(st.session_state.processes):
             if process['name']:
-                # 첫 번째 행
-                cols1 = st.columns([1, 1.2, 0.5, 1.2, 0.5, 0.5, 0.8, 0.5, 0.5, 0.8, 0.6, 0.6, 0.6, 0.6])
+                # 메인 데이터 행
+                cols = st.columns([1, 1.5, 0.5, 1.5, 0.5, 0.5, 0.5, 0.5, 0.8, 0.6, 0.6, 0.6, 0.6])
                 
-                with cols1[0]:
+                # 공정(작업)순서
+                with cols[0]:
                     st.text_input(f"공정_{idx}", value=process['name'], disabled=True, label_visibility="collapsed")
                 
-                with cols1[1]:
-                    st.text_area(f"기계_{idx}", value=process['equipment'], height=100, disabled=True, label_visibility="collapsed")
+                # 기계기구 및 설비명
+                with cols[1]:
+                    st.text_area(f"기계_{idx}", value=process['equipment'], height=80, disabled=True, label_visibility="collapsed")
                 
-                with cols1[2]:
+                # 기계 수량
+                with cols[2]:
                     st.text_input(f"기계수량_{idx}", placeholder="", label_visibility="collapsed")
                 
-                with cols1[3]:
-                    st.text_area(f"화학_{idx}", value=process['hazardous_material'], height=100, disabled=True, label_visibility="collapsed")
+                # 화학물질명
+                with cols[3]:
+                    st.text_area(f"화학_{idx}", value=process['hazardous_material'], height=80, disabled=True, label_visibility="collapsed")
                 
-                with cols1[4]:
+                # 화학물질 취급량/일
+                with cols[4]:
                     st.text_input(f"화학취급량_{idx}", placeholder="", label_visibility="collapsed")
                 
-                with cols1[5]:
-                    st.text_input(f"수량_{idx}", placeholder="", label_visibility="collapsed")
+                # 취급시간
+                with cols[5]:
+                    st.text_input(f"취급시간_{idx}", placeholder="", label_visibility="collapsed")
                 
-                with cols1[6]:
-                    st.text_input(f"화학물질명_{idx}", placeholder="", label_visibility="collapsed")
+                # 3년간 재해사례
+                with cols[6]:
+                    st.text_input(f"재해사례_{idx}", placeholder="", label_visibility="collapsed")
                 
-                with cols1[7]:
-                    st.text_input(f"취급량_{idx}", placeholder="", label_visibility="collapsed")
-                
-                with cols1[8]:
+                # 앗차사고사례
+                with cols[7]:
                     st.text_input(f"앗차_{idx}", placeholder="", label_visibility="collapsed")
                 
-                with cols1[9]:
+                # 근로자 구성및특성
+                with cols[8]:
                     st.text_input(f"근로자구성_{idx}", placeholder="", label_visibility="collapsed")
                 
-                with cols1[10]:
+                # 도급/교대 작업유무
+                with cols[9]:
                     st.selectbox(f"도급_{idx}", ["", "유", "무"], label_visibility="collapsed")
                 
-                with cols1[11]:
+                # 운반수단
+                with cols[10]:
                     st.text_input(f"운반_{idx}", placeholder="", label_visibility="collapsed")
                 
-                with cols1[12]:
+                # 안전작업허가증유무
+                with cols[11]:
                     st.selectbox(f"허가증_{idx}", ["", "유", "무"], label_visibility="collapsed")
                 
-                with cols1[13]:
+                # 작업환경측정유무
+                with cols[12]:
                     st.selectbox(f"측정_{idx}", ["", "유", "무"], label_visibility="collapsed")
                 
-                # 특별안전교육대상 (별도 행)
-                cols2 = st.columns([7.5, 1.2])
-                with cols2[0]:
-                    st.markdown("")  # 빈 공간
-                with cols2[1]:
-                    st.text_input(f"특별교육_{idx}", placeholder="특별안전교육대상", label_visibility="collapsed")
+                # 특별안전교육대상 (별도 행, 전체 너비)
+                st.text_input(f"특별교육_{idx}", placeholder="특별안전교육대상", label_visibility="collapsed", key=f"special_edu_{idx}")
                 
                 st.markdown('<hr style="margin: 5px 0; border: 0; border-top: 1px solid #e5e7eb;">', unsafe_allow_html=True)
 
