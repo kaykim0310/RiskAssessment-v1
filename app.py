@@ -1062,9 +1062,9 @@ with tab4:
                         'classification_code': ''
                     }
                 
-                # 테이블 구조 생성
+                # 테이블 구조 생성 - 헤더만 표시
                 st.markdown(f"""
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
                     <tr>
                         <td colspan="2" style="border: 1px solid #000; background-color: #fef3c7; text-align: center; font-weight: bold; padding: 10px;">
                             제조 공정
