@@ -1066,7 +1066,7 @@ with tab4:
                             제조 공정
                         </td>
                         <td style="border: 1px solid #1f2937; background-color: white; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 10%;">
-                            
+                            &nbsp;
                         </td>
                         <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 15px;">
                             유해위험요인 분류
@@ -1078,7 +1078,7 @@ with tab4:
                             분류 코드
                         </td>
                         <td style="border: 1px solid #1f2937; background-color: white; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 10%;">
-                            
+                            &nbsp;
                         </td>
                     </tr>
                 </table>
