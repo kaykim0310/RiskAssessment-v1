@@ -867,8 +867,6 @@ with tab4:
     if 'processes' in st.session_state:
         for idx, process in enumerate(st.session_state.processes):
             if process['name']:  # 공정명이 있는 경우만
-                st.markdown(f'<h3 style="text-align: center; color: #1f2937; margin-top: 30px;">공정: {process["name"]}</h3>', unsafe_allow_html=True)
-                
                 # 각 공정별 데이터 저장을 위한 키
                 process_key = f"hazard_{idx}"
                 if process_key not in st.session_state.hazard_classifications:
@@ -911,30 +909,49 @@ with tab4:
                 </style>
                 """, unsafe_allow_html=True)
                 
-                # 공정 제목 (위의 공정과 동일한 스타일)
+                # 공정 제목 (위의 공정과 동일한 스타일) - 수정사항 1
                 st.markdown(f"""
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 0px;">
                     <tr>
-                        <td colspan="4" style="text-align: center; font-size: 18px; font-weight: bold; padding: 15px; background-color: white;">
+                        <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 10px; width: 10%;">
+                            제조 공정
+                        </td>
+                        <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 10px; width: 15%;">
+                            입력공간
+                        </td>
+                        <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 10px;">
+                            유해위험요인 분류
+                        </td>
+                        <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 10px; width: 10%;">
+                            세부 공정
+                        </td>
+                        <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 10px; width: 10%;">
+                            분류 코드
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="border: 1px solid #1f2937; text-align: center; font-size: 18px; font-weight: bold; padding: 15px; background-color: white;">
                             공정: {chr(65 + idx)}
+                        </td>
+                        <td style="border: 1px solid #1f2937; text-align: center; font-size: 14px; padding: 10px; background-color: white;">
+                            공정: {chr(65 + idx)}
+                        </td>
+                        <td style="border: 1px solid #1f2937; text-align: center; font-size: 14px; padding: 10px; background-color: white;">
+                            
                         </td>
                     </tr>
                 </table>
                 """, unsafe_allow_html=True)
                 
-                # 테이블 헤더
+                # 테이블 헤더 - 유해위험요인 분류 아래에 하위 헤더 없음
                 st.markdown(f"""
-                <table class="hazard-table">
+                <table class="hazard-table" style="margin-top: 0px;">
                     <tr>
-                        <th rowspan="2" style="width: 10%;">제조 공정</th>
-                        <th colspan="3" style="width: 70%;">유해위험요인 분류</th>
-                        <th rowspan="2" style="width: 10%;">세부 공정</th>
-                        <th rowspan="2" style="width: 10%;">분류 코드</th>
-                    </tr>
-                    <tr>
+                        <th style="width: 10%;">제조 공정</th>
                         <th style="width: 15%;">분류</th>
-                        <th style="width: 35%;">분야</th>
-                        <th style="width: 20%;">유해 위험 요인</th>
+                        <th colspan="3" style="width: 55%;">유해위험요인 분류</th>
+                        <th style="width: 10%;">세부 공정</th>
+                        <th style="width: 10%;">분류 코드</th>
                     </tr>
                 </table>
                 """, unsafe_allow_html=True)
@@ -989,8 +1006,9 @@ with tab4:
                             if hazard_input:
                                 for item_idx in range(len(row_items)):
                                     key = f"{process_key}_{category_idx}_{row_idx}_{item_idx}"
-                                    if key in st.session_state.hazard_classifications[process_key]:
-                                        st.session_state.hazard_classifications[process_key][key]['hazard'] = hazard_input
+                                    if key not in st.session_state.hazard_classifications[process_key]:
+                                        st.session_state.hazard_classifications[process_key][key] = {}
+                                    st.session_state.hazard_classifications[process_key][key]['hazard'] = hazard_input
                         
                         # 세부 공정 (첫 번째 카테고리의 첫 번째 행에만 표시)
                         with cols[6]:
