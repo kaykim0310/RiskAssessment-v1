@@ -1065,8 +1065,8 @@ with tab4:
                         <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 10%;">
                             제조 공정
                         </td>
-                        <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 15%; color: red;">
-                            입력공간
+                        <td style="border: 1px solid #1f2937; background-color: white; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 10%;">
+                            
                         </td>
                         <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 15px;">
                             유해위험요인 분류
@@ -1077,8 +1077,8 @@ with tab4:
                         <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 10%;">
                             분류 코드
                         </td>
-                        <td style="border: 1px solid #1f2937; background-color: #fef3c7; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 10%; color: red;">
-                            입력공간
+                        <td style="border: 1px solid #1f2937; background-color: white; text-align: center; font-size: 16px; font-weight: bold; padding: 15px; width: 10%;">
+                            
                         </td>
                     </tr>
                 </table>
@@ -1090,8 +1090,8 @@ with tab4:
                     for row_idx in range(0, len(items), 3):
                         row_items = items[row_idx:row_idx+3]
                         
-                        # 행의 각 항목을 표시 - 6개 컬럼에 맞춰 조정
-                        cols = st.columns([0.5, 1.0, 0.8, 0.8, 0.8, 2.4, 0.8, 0.8, 1.0])
+                        # 행의 각 항목을 표시
+                        cols = st.columns([0.5, 0.5, 1.2, 0.8, 0.8, 0.8, 2.4, 0.8, 0.8, 0.5])
                         
                         # 분류 번호 (각 카테고리의 첫 번째 행에만 표시)
                         with cols[0]:
@@ -1102,10 +1102,9 @@ with tab4:
                                            label_visibility="collapsed",
                                            height=50)
                         
-                        # 입력공간 (첫 번째)
+                        # 입력공간 (첫 번째) - 빈 입력칸
                         with cols[1]:
                             st.text_area(f"입력공간1_{process_key}_{category_idx}_{row_idx}", 
-                                       value="", 
                                        label_visibility="collapsed",
                                        height=50)
                         
@@ -1154,10 +1153,16 @@ with tab4:
                                            label_visibility="collapsed",
                                            height=50)
                         
-                        # 입력공간 (두 번째)
+                        # 분류 코드 (첫 번째 카테고리의 첫 번째 행에만 표시)
                         with cols[8]:
+                            if category_idx == 0 and row_idx == 0:
+                                st.text_input(f"분류코드_{process_key}", 
+                                           placeholder="분류코드 입력",
+                                           label_visibility="collapsed")
+                        
+                        # 입력공간 (두 번째) - 빈 입력칸
+                        with cols[9]:
                             st.text_area(f"입력공간2_{process_key}_{category_idx}_{row_idx}", 
-                                       value="", 
                                        label_visibility="collapsed",
                                        height=50)
                         
