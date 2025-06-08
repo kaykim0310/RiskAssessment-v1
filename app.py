@@ -907,7 +907,8 @@ with tab4:
                     <tr>
                         <th rowspan="2">제조 공정</th>
                         <th colspan="3">유해위험요인 분류</th>
-                        <th rowspan="2">세부 공정<br><br>분류 코드</th>
+                        <th rowspan="2">세부 공정</th>
+                        <th rowspan="2">분류 코드</th>
                     </tr>
                     <tr>
                         <th>분류</th>
@@ -922,7 +923,7 @@ with tab4:
                 for category_idx, (category, items) in enumerate(hazard_categories.items()):
                     for item_idx, item in enumerate(items):
                         row_key = f"{process_key}_{category_idx}_{item_idx}"
-                        cols = st.columns([1, 1.5, 2.5, 3, 1.5])
+                        cols = st.columns([1, 1.5, 2.5, 3, 1.2, 1.2])
                         
                         with cols[0]:
                             if item_idx == 0:  # 각 카테고리의 첫 번째 항목에서만 표시
@@ -936,7 +937,7 @@ with tab4:
                             st.text_input("분야", value=item, disabled=True, label_visibility="collapsed", key=f"field_{row_key}")
                         
                         with cols[3]:
-                            hazard = st.text_area("유해위험요인", placeholder="유해위험요인 입력", label_visibility="collapsed", 
+                            hazard = st.text_area("유해위험요인", value="", label_visibility="collapsed", 
                                                  key=f"hazard_{row_key}", height=50)
                             if hazard:
                                 if row_key not in st.session_state.hazard_classifications[process_key]:
@@ -944,8 +945,12 @@ with tab4:
                                 st.session_state.hazard_classifications[process_key][row_key]['hazard'] = hazard
                         
                         with cols[4]:
-                            if item_idx == 0:  # 각 카테고리의 첫 번째 항목에서만 표시
+                            if category_idx == 0 and item_idx == 0:  # 첫 번째 카테고리의 첫 번째 항목에서만 표시
                                 st.text_input("세부공정", value=process['name'], disabled=True, label_visibility="collapsed", key=f"proc_{row_key}")
+                        
+                        with cols[5]:
+                            if category_idx == 0 and item_idx == 0:  # 첫 번째 카테고리의 첫 번째 항목에서만 표시
+                                st.text_input("분류코드", value=f"공정: {chr(65 + idx)}", disabled=True, label_visibility="collapsed", key=f"code_{row_key}")
                         
                         st.markdown('<hr style="margin: 5px 0; border: 0; border-top: 1px solid #e5e7eb;">', unsafe_allow_html=True)
                 
@@ -974,7 +979,8 @@ with tab4:
                                             '분류': category,
                                             '분야': item,
                                             '유해위험요인': hazard_data['hazard'],
-                                            '세부공정': process['name']
+                                            '세부공정': process['name'],
+                                            '분류코드': f"공정: {chr(65 + process_idx)}"
                                         })
             
             if all_hazard_data:
