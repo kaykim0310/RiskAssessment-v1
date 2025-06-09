@@ -1161,6 +1161,18 @@ with tab4:
                                                text-align: center; padding: {25 * row_count}px 5px; 
                                                font-weight: bold; height: {50 * row_count}px;
                                                display: flex; align-items: center; justify-content: center;">
+                                        {category_idx + 1}
+                                    </div>
+                                    """, unsafe_allow_html=True)
+                            
+                            # 분야 (카테고리당 한 번만)
+                            with cols[1]:
+                                if row_idx == 0:
+                                    st.markdown(f"""
+                                    <div style="border: 1px solid #000; background-color: #fef3c7; 
+                                               text-align: center; padding: {25 * row_count}px 5px; 
+                                               font-weight: bold; height: {50 * row_count}px;
+                                               display: flex; align-items: center; justify-content: center;">
                                         {category}
                                     </div>
                                     """, unsafe_allow_html=True)
@@ -1171,7 +1183,6 @@ with tab4:
                                     if sub_idx < len(item_list) and item_list[sub_idx][0]:
                                         checked = st.checkbox(
                                             item_list[sub_idx][0], 
-                                            value=item_list[sub_idx][1],
                                             key=f"cb_{process_key}_{category_idx}_{row_idx}_{sub_idx}"
                                         )
                                         # 체크박스 상태 저장
@@ -1351,16 +1362,4 @@ with tab4:
             download_filename = f"위험성평가_유해위험요인분류_{datetime.now().strftime('%Y%m%d')}.xlsx"
             href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="{download_filename}">📥 엑셀 파일 다운로드</a>'
             st.markdown(href, unsafe_allow_html=True)
-            st.success("유해위험요인 분류가 엑셀 파일로 저장되었습니다!")* row_count}px 5px; 
-                                               font-weight: bold; height: {50 * row_count}px;
-                                               display: flex; align-items: center; justify-content: center;">
-                                        {category_idx + 1}
-                                    </div>
-                                    """, unsafe_allow_html=True)
-                            
-                            # 분야 (카테고리당 한 번만)
-                            with cols[1]:
-                                if row_idx == 0:
-                                    st.markdown(f"""
-                                    <div style="border: 1px solid #000; background-color: #fef3c7; 
-                                               text-align: center; padding: {25
+            st.success("유해위험요인 분류가 엑셀 파일로 저장되었습니다!")
